@@ -2,7 +2,7 @@
 
 One MCP gateway for the ProGear basketball-equipment demo, hosting four domains — Inventory, Customer, Sales, and Pricing — each speaking the real MCP protocol (Streamable HTTP transport) and secured by **your own Okta org** (its own Custom Authorization Server + scope set per domain).
 
-This is a deliberately smaller sibling of [`ProGearSalesAI`](https://github.com/oktaforai-okta/ProGearSalesAI): no Auth0 FGA, no ID-JAG token exchange, no LangGraph orchestrator, no frontend. Just tools an agent can call directly, gated by a normal OAuth bearer token + scope check against Okta.
+This is a deliberately smaller sibling of [`ProGearSalesAI`](https://github.com/oktaforai-okta/ProGearSalesAI): no Auth0 FGA, no LangGraph orchestrator, no frontend. The gateway itself just validates whatever bearer token it's given — it doesn't care how the caller got it. `packages/local-tester` (local-only, not deployed) demonstrates one way a caller might: human PKCE login + an agent doing the [ID-JAG](https://datatracker.ietf.org/doc/html/draft-parecki-oauth-identity-assertion-authz-grant) exchange to mint that token, mirroring the original app's Cross-App Access flow.
 
 ## Deployment shape
 
@@ -30,6 +30,7 @@ packages/
   shared/            # ported data + store, JWKS auth + scope enforcement, HTTP/MCP transport helper
   mcp-inventory/      mcp-customer/      mcp-sales/      mcp-pricing/   # tool definitions + standalone entrypoint each
   gateway/            # the actual deployment: mounts all 4 at /inventory, /customer, /sales, /pricing
+  local-tester/       # local-only: PKCE login + agent ID-JAG exchange, calls the deployed gateway (see its own README)
 ```
 
 ## Local development

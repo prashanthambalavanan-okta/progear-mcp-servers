@@ -8,6 +8,7 @@
     "packages/mcp-customer",
     "packages/mcp-sales",
     "packages/mcp-pricing",
+    "packages/local-tester",
     "packages/gateway"
   ],
   "scripts": {
@@ -16,6 +17,7 @@
     "dev:customer": "npm run dev -w packages/mcp-customer",
     "dev:sales": "npm run dev -w packages/mcp-sales",
     "dev:pricing": "npm run dev -w packages/mcp-pricing",
-    "dev:gateway": "npm run dev -w packages/gateway"
+    "dev:gateway": "npm run dev -w packages/gateway",
+    "dev:tester": "npm run dev -w packages/local-tester"
   }
 }
