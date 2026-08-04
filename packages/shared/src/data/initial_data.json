@@ -1,0 +1,1498 @@
+{
+  "inventory": {
+    "BB-PRO-001": {
+      "name": "Pro Game Basketball",
+      "sku": "BB-PRO-001",
+      "category": "Basketballs",
+      "quantity": 2847,
+      "status": "good",
+      "reorder_point": 500
+    },
+    "BB-COMP-001": {
+      "name": "Pro Composite Basketball",
+      "sku": "BB-COMP-001",
+      "category": "Basketballs",
+      "quantity": 1523,
+      "status": "good",
+      "reorder_point": 300
+    },
+    "BB-WOM-001": {
+      "name": "Women's Official Basketball",
+      "sku": "BB-WOM-001",
+      "category": "Basketballs",
+      "quantity": 1234,
+      "status": "good",
+      "reorder_point": 250
+    },
+    "BB-YTH5-001": {
+      "name": "Youth Size 5 Basketball",
+      "sku": "BB-YTH5-001",
+      "category": "Basketballs",
+      "quantity": 3567,
+      "status": "good",
+      "reorder_point": 500
+    },
+    "BB-YTH4-001": {
+      "name": "Youth Size 4 Basketball",
+      "sku": "BB-YTH4-001",
+      "category": "Basketballs",
+      "quantity": 2156,
+      "status": "good",
+      "reorder_point": 400
+    },
+    "BB-IND-001": {
+      "name": "Indoor Premium Basketball",
+      "sku": "BB-IND-001",
+      "category": "Basketballs",
+      "quantity": 892,
+      "status": "good",
+      "reorder_point": 200
+    },
+    "BB-OUT-001": {
+      "name": "Outdoor Rubber Basketball",
+      "sku": "BB-OUT-001",
+      "category": "Basketballs",
+      "quantity": 4521,
+      "status": "good",
+      "reorder_point": 600
+    },
+    "BB-TRN-001": {
+      "name": "Training Heavy Basketball",
+      "sku": "BB-TRN-001",
+      "category": "Basketballs",
+      "quantity": 645,
+      "status": "good",
+      "reorder_point": 150
+    },
+    "HP-ARENA-001": {
+      "name": "Pro Arena Hoop System",
+      "sku": "HP-ARENA-001",
+      "category": "Hoops & Backboards",
+      "quantity": 45,
+      "status": "low",
+      "reorder_point": 50
+    },
+    "HP-PORT-001": {
+      "name": "Portable Hoop System",
+      "sku": "HP-PORT-001",
+      "category": "Hoops & Backboards",
+      "quantity": 234,
+      "status": "good",
+      "reorder_point": 75
+    },
+    "HP-WALL-001": {
+      "name": "Wall-Mount Hoop",
+      "sku": "HP-WALL-001",
+      "category": "Hoops & Backboards",
+      "quantity": 567,
+      "status": "good",
+      "reorder_point": 100
+    },
+    "HP-YTH-001": {
+      "name": "Youth Adjustable Hoop",
+      "sku": "HP-YTH-001",
+      "category": "Hoops & Backboards",
+      "quantity": 823,
+      "status": "good",
+      "reorder_point": 150
+    },
+    "HP-RIM-001": {
+      "name": "Breakaway Rim Pro",
+      "sku": "HP-RIM-001",
+      "category": "Hoops & Backboards",
+      "quantity": 412,
+      "status": "good",
+      "reorder_point": 100
+    },
+    "HP-BACK-001": {
+      "name": "Replacement Backboard 72\"",
+      "sku": "HP-BACK-001",
+      "category": "Hoops & Backboards",
+      "quantity": 89,
+      "status": "low",
+      "reorder_point": 100
+    },
+    "NT-PRO-001": {
+      "name": "Pro Competition Net (White)",
+      "sku": "NT-PRO-001",
+      "category": "Nets & Accessories",
+      "quantity": 2340,
+      "status": "good",
+      "reorder_point": 400
+    },
+    "NT-CHN-001": {
+      "name": "Heavy Duty Chain Net",
+      "sku": "NT-CHN-001",
+      "category": "Nets & Accessories",
+      "quantity": 1123,
+      "status": "good",
+      "reorder_point": 200
+    },
+    "NT-AWP-001": {
+      "name": "Anti-Whip Net Pro",
+      "sku": "NT-AWP-001",
+      "category": "Nets & Accessories",
+      "quantity": 1567,
+      "status": "good",
+      "reorder_point": 300
+    },
+    "AC-PMP-001": {
+      "name": "Ball Pump Pro",
+      "sku": "AC-PMP-001",
+      "category": "Nets & Accessories",
+      "quantity": 3421,
+      "status": "good",
+      "reorder_point": 500
+    },
+    "AC-BAG-001": {
+      "name": "Ball Bag (holds 10)",
+      "sku": "AC-BAG-001",
+      "category": "Nets & Accessories",
+      "quantity": 892,
+      "status": "good",
+      "reorder_point": 150
+    },
+    "AC-RCK-001": {
+      "name": "Ball Rack (holds 16)",
+      "sku": "AC-RCK-001",
+      "category": "Nets & Accessories",
+      "quantity": 234,
+      "status": "good",
+      "reorder_point": 50
+    },
+    "UNI-JRS-001": {
+      "name": "Pro Game Jersey",
+      "sku": "UNI-JRS-001",
+      "category": "Uniforms & Apparel",
+      "quantity": 4521,
+      "status": "good",
+      "reorder_point": 800
+    },
+    "UNI-SHT-001": {
+      "name": "Pro Game Shorts",
+      "sku": "UNI-SHT-001",
+      "category": "Uniforms & Apparel",
+      "quantity": 4234,
+      "status": "good",
+      "reorder_point": 800
+    },
+    "UNI-REV-001": {
+      "name": "Reversible Practice Jersey",
+      "sku": "UNI-REV-001",
+      "category": "Uniforms & Apparel",
+      "quantity": 3892,
+      "status": "good",
+      "reorder_point": 600
+    },
+    "UNI-WRM-001": {
+      "name": "Warm-Up Jacket",
+      "sku": "UNI-WRM-001",
+      "category": "Uniforms & Apparel",
+      "quantity": 1234,
+      "status": "good",
+      "reorder_point": 250
+    },
+    "UNI-WRP-001": {
+      "name": "Warm-Up Pants",
+      "sku": "UNI-WRP-001",
+      "category": "Uniforms & Apparel",
+      "quantity": 1456,
+      "status": "good",
+      "reorder_point": 300
+    },
+    "UNI-SHO-001": {
+      "name": "Shooting Shirt",
+      "sku": "UNI-SHO-001",
+      "category": "Uniforms & Apparel",
+      "quantity": 2123,
+      "status": "good",
+      "reorder_point": 400
+    },
+    "UNI-HOD-001": {
+      "name": "Team Hoodie",
+      "sku": "UNI-HOD-001",
+      "category": "Uniforms & Apparel",
+      "quantity": 1678,
+      "status": "good",
+      "reorder_point": 300
+    },
+    "UNI-PRS-001": {
+      "name": "Practice Shorts",
+      "sku": "UNI-PRS-001",
+      "category": "Uniforms & Apparel",
+      "quantity": 5234,
+      "status": "good",
+      "reorder_point": 800
+    },
+    "TR-CON-001": {
+      "name": "Agility Cones (set of 20)",
+      "sku": "TR-CON-001",
+      "category": "Training Equipment",
+      "quantity": 1234,
+      "status": "good",
+      "reorder_point": 200
+    },
+    "TR-LAD-001": {
+      "name": "Agility Ladder",
+      "sku": "TR-LAD-001",
+      "category": "Training Equipment",
+      "quantity": 892,
+      "status": "good",
+      "reorder_point": 150
+    },
+    "TR-GOG-001": {
+      "name": "Dribble Goggles",
+      "sku": "TR-GOG-001",
+      "category": "Training Equipment",
+      "quantity": 2341,
+      "status": "good",
+      "reorder_point": 400
+    },
+    "TR-RES-001": {
+      "name": "Resistance Bands Set",
+      "sku": "TR-RES-001",
+      "category": "Training Equipment",
+      "quantity": 1567,
+      "status": "good",
+      "reorder_point": 300
+    },
+    "TR-ARC-001": {
+      "name": "Shot Arc Trainer",
+      "sku": "TR-ARC-001",
+      "category": "Training Equipment",
+      "quantity": 423,
+      "status": "good",
+      "reorder_point": 100
+    },
+    "TR-SLD-001": {
+      "name": "Defensive Slide Trainer",
+      "sku": "TR-SLD-001",
+      "category": "Training Equipment",
+      "quantity": 67,
+      "status": "low",
+      "reorder_point": 75
+    },
+    "FW-PRO-001": {
+      "name": "Pro Court Basketball Shoe",
+      "sku": "FW-PRO-001",
+      "category": "Footwear",
+      "quantity": 1892,
+      "status": "good",
+      "reorder_point": 300
+    },
+    "FW-YTH-001": {
+      "name": "Youth Basketball Shoe",
+      "sku": "FW-YTH-001",
+      "category": "Footwear",
+      "quantity": 2341,
+      "status": "good",
+      "reorder_point": 400
+    },
+    "FW-TRN-001": {
+      "name": "Training Shoe",
+      "sku": "FW-TRN-001",
+      "category": "Footwear",
+      "quantity": 1123,
+      "status": "good",
+      "reorder_point": 200
+    },
+    "FW-REF-001": {
+      "name": "Referee Shoe",
+      "sku": "FW-REF-001",
+      "category": "Footwear",
+      "quantity": 234,
+      "status": "good",
+      "reorder_point": 50
+    },
+    "BB-MINI-001": {
+      "name": "Mini Basketball",
+      "sku": "BB-MINI-001",
+      "category": "Basketballs",
+      "quantity": 3120,
+      "status": "good",
+      "reorder_point": 500
+    },
+    "BB-PRAC-001": {
+      "name": "Practice Rubber Basketball",
+      "sku": "BB-PRAC-001",
+      "category": "Basketballs",
+      "quantity": 2890,
+      "status": "good",
+      "reorder_point": 500
+    },
+    "BB-AUTO-001": {
+      "name": "Autograph Model Basketball",
+      "sku": "BB-AUTO-001",
+      "category": "Basketballs",
+      "quantity": 156,
+      "status": "low",
+      "reorder_point": 180
+    },
+    "BB-YCOMP-001": {
+      "name": "Composite Youth Basketball",
+      "sku": "BB-YCOMP-001",
+      "category": "Basketballs",
+      "quantity": 1876,
+      "status": "good",
+      "reorder_point": 350
+    },
+    "HP-INGR-001": {
+      "name": "In-Ground Pro Hoop System",
+      "sku": "HP-INGR-001",
+      "category": "Hoops & Backboards",
+      "quantity": 18,
+      "status": "low",
+      "reorder_point": 25
+    },
+    "HP-GLS60-001": {
+      "name": "Glass Backboard 60\"",
+      "sku": "HP-GLS60-001",
+      "category": "Hoops & Backboards",
+      "quantity": 76,
+      "status": "good",
+      "reorder_point": 60
+    },
+    "HP-MINI-001": {
+      "name": "Mini Hoop (Over-Door)",
+      "sku": "HP-MINI-001",
+      "category": "Hoops & Backboards",
+      "quantity": 645,
+      "status": "good",
+      "reorder_point": 150
+    },
+    "HP-POLE-001": {
+      "name": "Adjustable Height Pole",
+      "sku": "HP-POLE-001",
+      "category": "Hoops & Backboards",
+      "quantity": 134,
+      "status": "good",
+      "reorder_point": 100
+    },
+    "NT-PRAC-001": {
+      "name": "Practice Net (Nylon)",
+      "sku": "NT-PRAC-001",
+      "category": "Nets & Accessories",
+      "quantity": 1892,
+      "status": "good",
+      "reorder_point": 300
+    },
+    "AC-CLIP-001": {
+      "name": "Anti-Sag Net Clip Set",
+      "sku": "AC-CLIP-001",
+      "category": "Nets & Accessories",
+      "quantity": 2456,
+      "status": "good",
+      "reorder_point": 400
+    },
+    "AC-NDL-001": {
+      "name": "Ball Inflation Needle Kit (10-pack)",
+      "sku": "AC-NDL-001",
+      "category": "Nets & Accessories",
+      "quantity": 3890,
+      "status": "good",
+      "reorder_point": 500
+    },
+    "AC-CRT-001": {
+      "name": "Ball Cart (holds 30)",
+      "sku": "AC-CRT-001",
+      "category": "Nets & Accessories",
+      "quantity": 87,
+      "status": "good",
+      "reorder_point": 40
+    },
+    "UNI-REF-001": {
+      "name": "Referee Jersey",
+      "sku": "UNI-REF-001",
+      "category": "Uniforms & Apparel",
+      "quantity": 678,
+      "status": "good",
+      "reorder_point": 150
+    },
+    "UNI-CMP-001": {
+      "name": "Compression Shirt",
+      "sku": "UNI-CMP-001",
+      "category": "Uniforms & Apparel",
+      "quantity": 2345,
+      "status": "good",
+      "reorder_point": 400
+    },
+    "UNI-SCK-001": {
+      "name": "Pro Team Socks (6-pack)",
+      "sku": "UNI-SCK-001",
+      "category": "Uniforms & Apparel",
+      "quantity": 4567,
+      "status": "good",
+      "reorder_point": 700
+    },
+    "UNI-HWB-001": {
+      "name": "Headband & Wristband Set",
+      "sku": "UNI-HWB-001",
+      "category": "Uniforms & Apparel",
+      "quantity": 3120,
+      "status": "good",
+      "reorder_point": 500
+    },
+    "TR-MCH-001": {
+      "name": "Automated Shooting Machine",
+      "sku": "TR-MCH-001",
+      "category": "Training Equipment",
+      "quantity": 12,
+      "status": "low",
+      "reorder_point": 15
+    },
+    "TR-VST-001": {
+      "name": "Weighted Training Vest",
+      "sku": "TR-VST-001",
+      "category": "Training Equipment",
+      "quantity": 456,
+      "status": "good",
+      "reorder_point": 100
+    },
+    "TR-PLY-001": {
+      "name": "Plyo Box Set (3-tier)",
+      "sku": "TR-PLY-001",
+      "category": "Training Equipment",
+      "quantity": 289,
+      "status": "good",
+      "reorder_point": 75
+    },
+    "TR-ROP-001": {
+      "name": "Speed Jump Rope",
+      "sku": "TR-ROP-001",
+      "category": "Training Equipment",
+      "quantity": 1678,
+      "status": "good",
+      "reorder_point": 250
+    },
+    "FW-WOM-001": {
+      "name": "Women's Basketball Shoe",
+      "sku": "FW-WOM-001",
+      "category": "Footwear",
+      "quantity": 1456,
+      "status": "good",
+      "reorder_point": 300
+    },
+    "FW-HGH-001": {
+      "name": "High-Top Trainer",
+      "sku": "FW-HGH-001",
+      "category": "Footwear",
+      "quantity": 987,
+      "status": "good",
+      "reorder_point": 200
+    },
+    "FW-LOW-001": {
+      "name": "Low-Top Trainer",
+      "sku": "FW-LOW-001",
+      "category": "Footwear",
+      "quantity": 1234,
+      "status": "good",
+      "reorder_point": 250
+    },
+    "CG-CLK-001": {
+      "name": "Shot Clock System",
+      "sku": "CG-CLK-001",
+      "category": "Court & Game Equipment",
+      "quantity": 23,
+      "status": "good",
+      "reorder_point": 20
+    },
+    "CG-SCB-001": {
+      "name": "Scoreboard (Digital)",
+      "sku": "CG-SCB-001",
+      "category": "Court & Game Equipment",
+      "quantity": 15,
+      "status": "low",
+      "reorder_point": 20
+    },
+    "CG-ARR-001": {
+      "name": "Possession Arrow",
+      "sku": "CG-ARR-001",
+      "category": "Court & Game Equipment",
+      "quantity": 342,
+      "status": "good",
+      "reorder_point": 100
+    },
+    "CG-WHS-001": {
+      "name": "Referee Whistle (3-pack)",
+      "sku": "CG-WHS-001",
+      "category": "Court & Game Equipment",
+      "quantity": 2890,
+      "status": "good",
+      "reorder_point": 400
+    },
+    "CG-HRN-001": {
+      "name": "Scorer's Table Horn",
+      "sku": "CG-HRN-001",
+      "category": "Court & Game Equipment",
+      "quantity": 178,
+      "status": "good",
+      "reorder_point": 60
+    },
+    "CG-TAPE-001": {
+      "name": "Court Marking Tape",
+      "sku": "CG-TAPE-001",
+      "category": "Court & Game Equipment",
+      "quantity": 567,
+      "status": "good",
+      "reorder_point": 150
+    },
+    "BG-TEQ-001": {
+      "name": "Team Equipment Bag",
+      "sku": "BG-TEQ-001",
+      "category": "Bags & Storage",
+      "quantity": 234,
+      "status": "good",
+      "reorder_point": 80
+    },
+    "BG-GYM-001": {
+      "name": "Personal Gym Bag",
+      "sku": "BG-GYM-001",
+      "category": "Bags & Storage",
+      "quantity": 1123,
+      "status": "good",
+      "reorder_point": 250
+    },
+    "BG-DUF-001": {
+      "name": "Rolling Duffel Bag",
+      "sku": "BG-DUF-001",
+      "category": "Bags & Storage",
+      "quantity": 345,
+      "status": "good",
+      "reorder_point": 100
+    },
+    "BG-RCK-001": {
+      "name": "Ball Storage Rack (holds 24)",
+      "sku": "BG-RCK-001",
+      "category": "Bags & Storage",
+      "quantity": 98,
+      "status": "good",
+      "reorder_point": 40
+    },
+    "BG-BPK-001": {
+      "name": "Travel Backpack",
+      "sku": "BG-BPK-001",
+      "category": "Bags & Storage",
+      "quantity": 678,
+      "status": "good",
+      "reorder_point": 150
+    },
+    "BB-STR-001": {
+      "name": "Street Basketball",
+      "sku": "BB-STR-001",
+      "category": "Basketballs",
+      "quantity": 2234,
+      "status": "good",
+      "reorder_point": 400
+    },
+    "BB-PRAC2-001": {
+      "name": "Composite Practice Basketball (Bulk 6-Pack)",
+      "sku": "BB-PRAC2-001",
+      "category": "Basketballs",
+      "quantity": 567,
+      "status": "good",
+      "reorder_point": 120
+    },
+    "HP-YSYS-001": {
+      "name": "Adjustable Youth Hoop System",
+      "sku": "HP-YSYS-001",
+      "category": "Hoops & Backboards",
+      "quantity": 289,
+      "status": "good",
+      "reorder_point": 100
+    },
+    "HP-ACR54-001": {
+      "name": "Acrylic Backboard 54\"",
+      "sku": "HP-ACR54-001",
+      "category": "Hoops & Backboards",
+      "quantity": 112,
+      "status": "good",
+      "reorder_point": 50
+    },
+    "AC-REP-001": {
+      "name": "Ball Repair Kit",
+      "sku": "AC-REP-001",
+      "category": "Nets & Accessories",
+      "quantity": 1789,
+      "status": "good",
+      "reorder_point": 300
+    },
+    "AC-HOOK-001": {
+      "name": "Net Hook Set (4-pack)",
+      "sku": "AC-HOOK-001",
+      "category": "Nets & Accessories",
+      "quantity": 2345,
+      "status": "good",
+      "reorder_point": 400
+    },
+    "UNI-POLO-001": {
+      "name": "Coach's Polo",
+      "sku": "UNI-POLO-001",
+      "category": "Uniforms & Apparel",
+      "quantity": 892,
+      "status": "good",
+      "reorder_point": 200
+    },
+    "UNI-TANK-001": {
+      "name": "Team Warmup Tank",
+      "sku": "UNI-TANK-001",
+      "category": "Uniforms & Apparel",
+      "quantity": 1567,
+      "status": "good",
+      "reorder_point": 300
+    },
+    "UNI-PIN-001": {
+      "name": "Practice Pinnies (set of 12)",
+      "sku": "UNI-PIN-001",
+      "category": "Uniforms & Apparel",
+      "quantity": 345,
+      "status": "good",
+      "reorder_point": 80
+    },
+    "TR-SNSR-001": {
+      "name": "Shot Tracking Sensor",
+      "sku": "TR-SNSR-001",
+      "category": "Training Equipment",
+      "quantity": 178,
+      "status": "good",
+      "reorder_point": 60
+    },
+    "TR-ROLL-001": {
+      "name": "Recovery Foam Roller",
+      "sku": "TR-ROLL-001",
+      "category": "Training Equipment",
+      "quantity": 934,
+      "status": "good",
+      "reorder_point": 200
+    },
+    "TR-VJT-001": {
+      "name": "Vertical Jump Trainer",
+      "sku": "TR-VJT-001",
+      "category": "Training Equipment",
+      "quantity": 267,
+      "status": "good",
+      "reorder_point": 75
+    },
+    "FW-CCH-001": {
+      "name": "Coach's Court Shoe",
+      "sku": "FW-CCH-001",
+      "category": "Footwear",
+      "quantity": 456,
+      "status": "good",
+      "reorder_point": 100
+    },
+    "FW-REFN-001": {
+      "name": "Slip-Resistant Referee Shoe",
+      "sku": "FW-REFN-001",
+      "category": "Footwear",
+      "quantity": 198,
+      "status": "good",
+      "reorder_point": 60
+    },
+    "CG-SUB-001": {
+      "name": "Player Substitution Board",
+      "sku": "CG-SUB-001",
+      "category": "Court & Game Equipment",
+      "quantity": 89,
+      "status": "good",
+      "reorder_point": 30
+    },
+    "CG-BNCH-001": {
+      "name": "Team Bench (8-seat)",
+      "sku": "CG-BNCH-001",
+      "category": "Court & Game Equipment",
+      "quantity": 34,
+      "status": "good",
+      "reorder_point": 15
+    },
+    "BG-CLIP-001": {
+      "name": "Coach's Clipboard Case",
+      "sku": "BG-CLIP-001",
+      "category": "Bags & Storage",
+      "quantity": 267,
+      "status": "good",
+      "reorder_point": 80
+    },
+    "BG-GARM-001": {
+      "name": "Uniform Garment Bag",
+      "sku": "BG-GARM-001",
+      "category": "Bags & Storage",
+      "quantity": 789,
+      "status": "good",
+      "reorder_point": 150
+    }
+  },
+  "pricing": {
+    "BB-PRO-001": {
+      "price": 149.99,
+      "cost": 62.0,
+      "margin": 58.7
+    },
+    "BB-COMP-001": {
+      "price": 89.99,
+      "cost": 38.0,
+      "margin": 57.8
+    },
+    "BB-WOM-001": {
+      "price": 129.99,
+      "cost": 55.0,
+      "margin": 57.7
+    },
+    "BB-YTH5-001": {
+      "price": 34.99,
+      "cost": 14.0,
+      "margin": 60.0
+    },
+    "BB-YTH4-001": {
+      "price": 29.99,
+      "cost": 12.0,
+      "margin": 60.0
+    },
+    "BB-IND-001": {
+      "price": 169.99,
+      "cost": 72.0,
+      "margin": 57.6
+    },
+    "BB-OUT-001": {
+      "price": 24.99,
+      "cost": 9.0,
+      "margin": 64.0
+    },
+    "BB-TRN-001": {
+      "price": 59.99,
+      "cost": 25.0,
+      "margin": 58.3
+    },
+    "HP-ARENA-001": {
+      "price": 1299.99,
+      "cost": 650.0,
+      "margin": 50.0
+    },
+    "HP-PORT-001": {
+      "price": 449.99,
+      "cost": 180.0,
+      "margin": 60.0
+    },
+    "HP-WALL-001": {
+      "price": 299.99,
+      "cost": 120.0,
+      "margin": 60.0
+    },
+    "HP-YTH-001": {
+      "price": 199.99,
+      "cost": 75.0,
+      "margin": 62.5
+    },
+    "HP-RIM-001": {
+      "price": 189.99,
+      "cost": 70.0,
+      "margin": 63.2
+    },
+    "HP-BACK-001": {
+      "price": 599.99,
+      "cost": 280.0,
+      "margin": 53.3
+    },
+    "NT-PRO-001": {
+      "price": 24.99,
+      "cost": 8.0,
+      "margin": 68.0
+    },
+    "NT-CHN-001": {
+      "price": 34.99,
+      "cost": 12.0,
+      "margin": 65.7
+    },
+    "NT-AWP-001": {
+      "price": 29.99,
+      "cost": 10.0,
+      "margin": 66.7
+    },
+    "AC-PMP-001": {
+      "price": 19.99,
+      "cost": 6.0,
+      "margin": 70.0
+    },
+    "AC-BAG-001": {
+      "price": 44.99,
+      "cost": 15.0,
+      "margin": 66.7
+    },
+    "AC-RCK-001": {
+      "price": 129.99,
+      "cost": 48.0,
+      "margin": 63.1
+    },
+    "UNI-JRS-001": {
+      "price": 54.99,
+      "cost": 18.0,
+      "margin": 67.3
+    },
+    "UNI-SHT-001": {
+      "price": 39.99,
+      "cost": 14.0,
+      "margin": 65.0
+    },
+    "UNI-REV-001": {
+      "price": 34.99,
+      "cost": 12.0,
+      "margin": 65.7
+    },
+    "UNI-WRM-001": {
+      "price": 79.99,
+      "cost": 32.0,
+      "margin": 60.0
+    },
+    "UNI-WRP-001": {
+      "price": 59.99,
+      "cost": 24.0,
+      "margin": 60.0
+    },
+    "UNI-SHO-001": {
+      "price": 44.99,
+      "cost": 16.0,
+      "margin": 64.4
+    },
+    "UNI-HOD-001": {
+      "price": 64.99,
+      "cost": 26.0,
+      "margin": 60.0
+    },
+    "UNI-PRS-001": {
+      "price": 29.99,
+      "cost": 10.0,
+      "margin": 66.7
+    },
+    "TR-CON-001": {
+      "price": 24.99,
+      "cost": 8.0,
+      "margin": 68.0
+    },
+    "TR-LAD-001": {
+      "price": 34.99,
+      "cost": 12.0,
+      "margin": 65.7
+    },
+    "TR-GOG-001": {
+      "price": 19.99,
+      "cost": 6.0,
+      "margin": 70.0
+    },
+    "TR-RES-001": {
+      "price": 29.99,
+      "cost": 10.0,
+      "margin": 66.7
+    },
+    "TR-ARC-001": {
+      "price": 89.99,
+      "cost": 35.0,
+      "margin": 61.1
+    },
+    "TR-SLD-001": {
+      "price": 149.99,
+      "cost": 58.0,
+      "margin": 61.3
+    },
+    "FW-PRO-001": {
+      "price": 159.99,
+      "cost": 65.0,
+      "margin": 59.4
+    },
+    "FW-YTH-001": {
+      "price": 79.99,
+      "cost": 32.0,
+      "margin": 60.0
+    },
+    "FW-TRN-001": {
+      "price": 119.99,
+      "cost": 48.0,
+      "margin": 60.0
+    },
+    "FW-REF-001": {
+      "price": 89.99,
+      "cost": 36.0,
+      "margin": 60.0
+    },
+    "BB-MINI-001": {
+      "price": 14.99,
+      "cost": 5.0,
+      "margin": 66.6
+    },
+    "BB-PRAC-001": {
+      "price": 19.99,
+      "cost": 7.0,
+      "margin": 65.0
+    },
+    "BB-AUTO-001": {
+      "price": 249.99,
+      "cost": 100.0,
+      "margin": 60.0
+    },
+    "BB-YCOMP-001": {
+      "price": 39.99,
+      "cost": 16.0,
+      "margin": 60.0
+    },
+    "HP-INGR-001": {
+      "price": 1899.99,
+      "cost": 950.0,
+      "margin": 50.0
+    },
+    "HP-GLS60-001": {
+      "price": 799.99,
+      "cost": 380.0,
+      "margin": 52.5
+    },
+    "HP-MINI-001": {
+      "price": 39.99,
+      "cost": 14.0,
+      "margin": 65.0
+    },
+    "HP-POLE-001": {
+      "price": 349.99,
+      "cost": 150.0,
+      "margin": 57.1
+    },
+    "NT-PRAC-001": {
+      "price": 17.99,
+      "cost": 5.5,
+      "margin": 69.4
+    },
+    "AC-CLIP-001": {
+      "price": 12.99,
+      "cost": 4.0,
+      "margin": 69.2
+    },
+    "AC-NDL-001": {
+      "price": 9.99,
+      "cost": 2.5,
+      "margin": 75.0
+    },
+    "AC-CRT-001": {
+      "price": 249.99,
+      "cost": 95.0,
+      "margin": 62.0
+    },
+    "UNI-REF-001": {
+      "price": 44.99,
+      "cost": 16.0,
+      "margin": 64.4
+    },
+    "UNI-CMP-001": {
+      "price": 34.99,
+      "cost": 12.0,
+      "margin": 65.7
+    },
+    "UNI-SCK-001": {
+      "price": 24.99,
+      "cost": 8.0,
+      "margin": 68.0
+    },
+    "UNI-HWB-001": {
+      "price": 14.99,
+      "cost": 4.5,
+      "margin": 70.0
+    },
+    "TR-MCH-001": {
+      "price": 3499.99,
+      "cost": 1600.0,
+      "margin": 54.3
+    },
+    "TR-VST-001": {
+      "price": 79.99,
+      "cost": 32.0,
+      "margin": 60.0
+    },
+    "TR-PLY-001": {
+      "price": 189.99,
+      "cost": 78.0,
+      "margin": 58.9
+    },
+    "TR-ROP-001": {
+      "price": 16.99,
+      "cost": 5.0,
+      "margin": 70.6
+    },
+    "FW-WOM-001": {
+      "price": 139.99,
+      "cost": 56.0,
+      "margin": 60.0
+    },
+    "FW-HGH-001": {
+      "price": 109.99,
+      "cost": 44.0,
+      "margin": 60.0
+    },
+    "FW-LOW-001": {
+      "price": 99.99,
+      "cost": 40.0,
+      "margin": 60.0
+    },
+    "CG-CLK-001": {
+      "price": 2499.99,
+      "cost": 1100.0,
+      "margin": 56.0
+    },
+    "CG-SCB-001": {
+      "price": 1899.99,
+      "cost": 850.0,
+      "margin": 55.3
+    },
+    "CG-ARR-001": {
+      "price": 89.99,
+      "cost": 35.0,
+      "margin": 61.1
+    },
+    "CG-WHS-001": {
+      "price": 12.99,
+      "cost": 3.5,
+      "margin": 73.1
+    },
+    "CG-HRN-001": {
+      "price": 44.99,
+      "cost": 16.0,
+      "margin": 64.4
+    },
+    "CG-TAPE-001": {
+      "price": 22.99,
+      "cost": 7.0,
+      "margin": 69.6
+    },
+    "BG-TEQ-001": {
+      "price": 129.99,
+      "cost": 52.0,
+      "margin": 60.0
+    },
+    "BG-GYM-001": {
+      "price": 39.99,
+      "cost": 14.0,
+      "margin": 65.0
+    },
+    "BG-DUF-001": {
+      "price": 79.99,
+      "cost": 30.0,
+      "margin": 62.5
+    },
+    "BG-RCK-001": {
+      "price": 179.99,
+      "cost": 68.0,
+      "margin": 62.2
+    },
+    "BG-BPK-001": {
+      "price": 64.99,
+      "cost": 24.0,
+      "margin": 63.1
+    },
+    "BB-STR-001": {
+      "price": 22.99,
+      "cost": 8.5,
+      "margin": 63.0
+    },
+    "BB-PRAC2-001": {
+      "price": 99.99,
+      "cost": 38.0,
+      "margin": 62.0
+    },
+    "HP-YSYS-001": {
+      "price": 249.99,
+      "cost": 105.0,
+      "margin": 58.0
+    },
+    "HP-ACR54-001": {
+      "price": 449.99,
+      "cost": 200.0,
+      "margin": 55.6
+    },
+    "AC-REP-001": {
+      "price": 8.99,
+      "cost": 2.25,
+      "margin": 75.0
+    },
+    "AC-HOOK-001": {
+      "price": 6.99,
+      "cost": 1.75,
+      "margin": 75.0
+    },
+    "UNI-POLO-001": {
+      "price": 39.99,
+      "cost": 14.0,
+      "margin": 65.0
+    },
+    "UNI-TANK-001": {
+      "price": 27.99,
+      "cost": 9.5,
+      "margin": 66.1
+    },
+    "UNI-PIN-001": {
+      "price": 54.99,
+      "cost": 19.0,
+      "margin": 65.4
+    },
+    "TR-SNSR-001": {
+      "price": 129.99,
+      "cost": 52.0,
+      "margin": 60.0
+    },
+    "TR-ROLL-001": {
+      "price": 24.99,
+      "cost": 8.0,
+      "margin": 68.0
+    },
+    "TR-VJT-001": {
+      "price": 219.99,
+      "cost": 90.0,
+      "margin": 59.1
+    },
+    "FW-CCH-001": {
+      "price": 89.99,
+      "cost": 36.0,
+      "margin": 60.0
+    },
+    "FW-REFN-001": {
+      "price": 94.99,
+      "cost": 38.0,
+      "margin": 60.0
+    },
+    "CG-SUB-001": {
+      "price": 64.99,
+      "cost": 24.0,
+      "margin": 63.1
+    },
+    "CG-BNCH-001": {
+      "price": 549.99,
+      "cost": 230.0,
+      "margin": 58.2
+    },
+    "BG-CLIP-001": {
+      "price": 34.99,
+      "cost": 12.0,
+      "margin": 65.7
+    },
+    "BG-GARM-001": {
+      "price": 29.99,
+      "cost": 10.0,
+      "margin": 66.7
+    }
+  },
+  "customers": {
+    "CUST-001": {
+      "id": "CUST-001",
+      "name": "State University Athletics",
+      "contact": "John Anderson",
+      "email": "janderson@stateuniv.edu",
+      "tier": "Platinum",
+      "total_spent": 124500,
+      "location": "Columbus, OH"
+    },
+    "CUST-002": {
+      "id": "CUST-002",
+      "name": "Metro High School District",
+      "contact": "Maria Santos",
+      "email": "msantos@metrohsd.edu",
+      "tier": "Platinum",
+      "total_spent": 118200,
+      "location": "Chicago, IL"
+    },
+    "CUST-003": {
+      "id": "CUST-003",
+      "name": "Pacific Coast Sports League",
+      "contact": "David Chen",
+      "email": "dchen@pcsl.org",
+      "tier": "Platinum",
+      "total_spent": 142800,
+      "location": "Los Angeles, CA"
+    },
+    "CUST-004": {
+      "id": "CUST-004",
+      "name": "Elite Basketball Academy",
+      "contact": "Sarah Mitchell",
+      "email": "smitchell@eliteba.com",
+      "tier": "Platinum",
+      "total_spent": 98500,
+      "location": "Atlanta, GA"
+    },
+    "CUST-005": {
+      "id": "CUST-005",
+      "name": "Riverside Community College",
+      "contact": "James Wilson",
+      "email": "jwilson@riversidecc.edu",
+      "tier": "Gold",
+      "total_spent": 67400,
+      "location": "Phoenix, AZ"
+    },
+    "CUST-006": {
+      "id": "CUST-006",
+      "name": "Downtown Recreation Center",
+      "contact": "Lisa Park",
+      "email": "lpark@downtownrec.org",
+      "tier": "Gold",
+      "total_spent": 45200,
+      "location": "Seattle, WA"
+    },
+    "CUST-007": {
+      "id": "CUST-007",
+      "name": "Eastside Youth League",
+      "contact": "Michael Brown",
+      "email": "mbrown@eastsideyl.org",
+      "tier": "Gold",
+      "total_spent": 52800,
+      "location": "Boston, MA"
+    },
+    "CUST-008": {
+      "id": "CUST-008",
+      "name": "Champions Training Facility",
+      "contact": "Robert Taylor",
+      "email": "rtaylor@champstf.com",
+      "tier": "Gold",
+      "total_spent": 78900,
+      "location": "Dallas, TX"
+    },
+    "CUST-009": {
+      "id": "CUST-009",
+      "name": "Valley High School",
+      "contact": "Jennifer Lee",
+      "email": "jlee@valleyhs.edu",
+      "tier": "Gold",
+      "total_spent": 38600,
+      "location": "Denver, CO"
+    },
+    "CUST-010": {
+      "id": "CUST-010",
+      "name": "Northside Sports Club",
+      "contact": "William Garcia",
+      "email": "wgarcia@northsidesc.com",
+      "tier": "Gold",
+      "total_spent": 41200,
+      "location": "Miami, FL"
+    },
+    "CUST-011": {
+      "id": "CUST-011",
+      "name": "Lincoln Middle School",
+      "contact": "Amanda Johnson",
+      "email": "ajohnson@lincolnms.edu",
+      "tier": "Silver",
+      "total_spent": 18400,
+      "location": "Portland, OR"
+    },
+    "CUST-012": {
+      "id": "CUST-012",
+      "name": "Sunset Recreation League",
+      "contact": "Kevin Martinez",
+      "email": "kmartinez@sunsetrl.org",
+      "tier": "Silver",
+      "total_spent": 12600,
+      "location": "San Diego, CA"
+    },
+    "CUST-013": {
+      "id": "CUST-013",
+      "name": "Community Youth Center",
+      "contact": "Rachel Thompson",
+      "email": "rthompson@cyc.org",
+      "tier": "Silver",
+      "total_spent": 15800,
+      "location": "Houston, TX"
+    },
+    "CUST-014": {
+      "id": "CUST-014",
+      "name": "Lakeside Gym",
+      "contact": "Daniel White",
+      "email": "dwhite@lakesidegym.com",
+      "tier": "Silver",
+      "total_spent": 8900,
+      "location": "Minneapolis, MN"
+    },
+    "CUST-015": {
+      "id": "CUST-015",
+      "name": "East County YMCA",
+      "contact": "Michelle Davis",
+      "email": "mdavis@ecymca.org",
+      "tier": "Silver",
+      "total_spent": 22100,
+      "location": "Philadelphia, PA"
+    },
+    "CUST-016": {
+      "id": "CUST-016",
+      "name": "Hoops Academy Jr",
+      "contact": "Christopher Lee",
+      "email": "clee@hoopsacademyjr.com",
+      "tier": "Silver",
+      "total_spent": 19500,
+      "location": "Detroit, MI"
+    },
+    "CUST-017": {
+      "id": "CUST-017",
+      "name": "Parks & Rec Department",
+      "contact": "Stephanie Moore",
+      "email": "smoore@cityparks.gov",
+      "tier": "Silver",
+      "total_spent": 11200,
+      "location": "Nashville, TN"
+    },
+    "CUST-018": {
+      "id": "CUST-018",
+      "name": "St. Mary's Catholic School",
+      "contact": "Thomas Anderson",
+      "email": "tanderson@stmarys.edu",
+      "tier": "Silver",
+      "total_spent": 16700,
+      "location": "St. Louis, MO"
+    },
+    "CUST-019": {
+      "id": "CUST-019",
+      "name": "Corner Store Sports",
+      "contact": "Brian Jackson",
+      "email": "bjackson@cornerstoresports.com",
+      "tier": "Bronze",
+      "total_spent": 3200,
+      "location": "Austin, TX"
+    },
+    "CUST-020": {
+      "id": "CUST-020",
+      "name": "Local Hoops Club",
+      "contact": "Nancy Williams",
+      "email": "nwilliams@localhoops.org",
+      "tier": "Bronze",
+      "total_spent": 2800,
+      "location": "Raleigh, NC"
+    },
+    "CUST-021": {
+      "id": "CUST-021",
+      "name": "Neighborhood Gym",
+      "contact": "Paul Robinson",
+      "email": "probinson@neighborhoodgym.com",
+      "tier": "Bronze",
+      "total_spent": 4100,
+      "location": "Cleveland, OH"
+    },
+    "CUST-022": {
+      "id": "CUST-022",
+      "name": "First Baptist Church League",
+      "contact": "Linda Martinez",
+      "email": "lmartinez@fbcleague.org",
+      "tier": "Bronze",
+      "total_spent": 1900,
+      "location": "Oklahoma City, OK"
+    },
+    "CUST-023": {
+      "id": "CUST-023",
+      "name": "Sunset Elementary PTA",
+      "contact": "Mark Thompson",
+      "email": "mthompson@sunsetpta.org",
+      "tier": "Bronze",
+      "total_spent": 2400,
+      "location": "Sacramento, CA"
+    },
+    "CUST-024": {
+      "id": "CUST-024",
+      "name": "Joe's Sporting Goods",
+      "contact": "Joseph Brown",
+      "email": "jbrown@joessports.com",
+      "tier": "Bronze",
+      "total_spent": 4800,
+      "location": "Indianapolis, IN"
+    },
+    "CUST-025": {
+      "id": "CUST-025",
+      "name": "Coastal Basketball Academy",
+      "contact": "Emily Rodriguez",
+      "email": "erodriguez@coastalba.com",
+      "tier": "Platinum",
+      "total_spent": 108900,
+      "location": "San Antonio, TX"
+    },
+    "CUST-026": {
+      "id": "CUST-026",
+      "name": "Midwest Collegiate League",
+      "contact": "Steven Clark",
+      "email": "sclark@midwestcl.org",
+      "tier": "Platinum",
+      "total_spent": 132400,
+      "location": "Kansas City, MO"
+    },
+    "CUST-027": {
+      "id": "CUST-027",
+      "name": "Bright Future Youth Sports",
+      "contact": "Angela Turner",
+      "email": "aturner@brightfutureys.org",
+      "tier": "Gold",
+      "total_spent": 61300,
+      "location": "Charlotte, NC"
+    },
+    "CUST-028": {
+      "id": "CUST-028",
+      "name": "Riverside Prep Academy",
+      "contact": "George Kim",
+      "email": "gkim@riversideprep.edu",
+      "tier": "Gold",
+      "total_spent": 55700,
+      "location": "Salt Lake City, UT"
+    },
+    "CUST-029": {
+      "id": "CUST-029",
+      "name": "Union Athletic Club",
+      "contact": "Patricia Nguyen",
+      "email": "pnguyen@unionathletic.org",
+      "tier": "Silver",
+      "total_spent": 24800,
+      "location": "Pittsburgh, PA"
+    },
+    "CUST-030": {
+      "id": "CUST-030",
+      "name": "Maple Grove Rec League",
+      "contact": "Frank Sullivan",
+      "email": "fsullivan@maplegrove.org",
+      "tier": "Silver",
+      "total_spent": 17200,
+      "location": "Milwaukee, WI"
+    },
+    "CUST-031": {
+      "id": "CUST-031",
+      "name": "Horizon Middle School",
+      "contact": "Diane Foster",
+      "email": "dfoster@horizonms.edu",
+      "tier": "Silver",
+      "total_spent": 14900,
+      "location": "Albuquerque, NM"
+    },
+    "CUST-032": {
+      "id": "CUST-032",
+      "name": "Sunrise Community Gym",
+      "contact": "Carlos Mendez",
+      "email": "cmendez@sunrisegym.com",
+      "tier": "Bronze",
+      "total_spent": 3600,
+      "location": "Tucson, AZ"
+    },
+    "CUST-033": {
+      "id": "CUST-033",
+      "name": "Westside Boys & Girls Club",
+      "contact": "Laura Bennett",
+      "email": "lbennett@westsidebgc.org",
+      "tier": "Bronze",
+      "total_spent": 2100,
+      "location": "Baltimore, MD"
+    },
+    "CUST-034": {
+      "id": "CUST-034",
+      "name": "Pineview Elementary PTA",
+      "contact": "Ryan Coleman",
+      "email": "rcoleman@pineviewpta.org",
+      "tier": "Bronze",
+      "total_spent": 1700,
+      "location": "Louisville, KY"
+    }
+  },
+  "discounts": {
+    "tier_discounts": {
+      "Platinum": 5,
+      "Gold": 3,
+      "Silver": 1,
+      "Bronze": 0
+    },
+    "volume_discounts": {
+      "10": 5,
+      "50": 10,
+      "100": 15,
+      "500": 20
+    }
+  }
+}

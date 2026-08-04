@@ -1,0 +1,52 @@
+services:
+  - type: web
+    name: progear-mcp-inventory
+    runtime: node
+    plan: starter
+    buildCommand: npm install && npm run build -w packages/mcp-inventory
+    startCommand: node packages/mcp-inventory/dist/server.js
+    healthCheckPath: /health
+    envVars:
+      - key: OKTA_ISSUER
+        sync: false
+      - key: OKTA_AUDIENCE
+        sync: false
+
+  - type: web
+    name: progear-mcp-customer
+    runtime: node
+    plan: starter
+    buildCommand: npm install && npm run build -w packages/mcp-customer
+    startCommand: node packages/mcp-customer/dist/server.js
+    healthCheckPath: /health
+    envVars:
+      - key: OKTA_ISSUER
+        sync: false
+      - key: OKTA_AUDIENCE
+        sync: false
+
+  - type: web
+    name: progear-mcp-sales
+    runtime: node
+    plan: starter
+    buildCommand: npm install && npm run build -w packages/mcp-sales
+    startCommand: node packages/mcp-sales/dist/server.js
+    healthCheckPath: /health
+    envVars:
+      - key: OKTA_ISSUER
+        sync: false
+      - key: OKTA_AUDIENCE
+        sync: false
+
+  - type: web
+    name: progear-mcp-pricing
+    runtime: node
+    plan: starter
+    buildCommand: npm install && npm run build -w packages/mcp-pricing
+    startCommand: node packages/mcp-pricing/dist/server.js
+    healthCheckPath: /health
+    envVars:
+      - key: OKTA_ISSUER
+        sync: false
+      - key: OKTA_AUDIENCE
+        sync: false

@@ -1,0 +1,19 @@
+{
+  "name": "progear-mcp-servers",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "packages/shared",
+    "packages/mcp-inventory",
+    "packages/mcp-customer",
+    "packages/mcp-sales",
+    "packages/mcp-pricing"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "dev:inventory": "npm run dev -w packages/mcp-inventory",
+    "dev:customer": "npm run dev -w packages/mcp-customer",
+    "dev:sales": "npm run dev -w packages/mcp-sales",
+    "dev:pricing": "npm run dev -w packages/mcp-pricing"
+  }
+}
