@@ -7,7 +7,9 @@ services:
     startCommand: node packages/mcp-inventory/dist/server.js
     healthCheckPath: /health
     envVars:
-      - key: OKTA_ISSUER
+      - key: OKTA_DOMAIN
+        sync: false
+      - key: OKTA_AUTH_SERVER_ID
         sync: false
       - key: OKTA_AUDIENCE
         sync: false
@@ -20,7 +22,9 @@ services:
     startCommand: node packages/mcp-customer/dist/server.js
     healthCheckPath: /health
     envVars:
-      - key: OKTA_ISSUER
+      - key: OKTA_DOMAIN
+        sync: false
+      - key: OKTA_AUTH_SERVER_ID
         sync: false
       - key: OKTA_AUDIENCE
         sync: false
@@ -33,7 +37,9 @@ services:
     startCommand: node packages/mcp-sales/dist/server.js
     healthCheckPath: /health
     envVars:
-      - key: OKTA_ISSUER
+      - key: OKTA_DOMAIN
+        sync: false
+      - key: OKTA_AUTH_SERVER_ID
         sync: false
       - key: OKTA_AUDIENCE
         sync: false
@@ -46,7 +52,9 @@ services:
     startCommand: node packages/mcp-pricing/dist/server.js
     healthCheckPath: /health
     envVars:
-      - key: OKTA_ISSUER
+      - key: OKTA_DOMAIN
+        sync: false
+      - key: OKTA_AUTH_SERVER_ID
         sync: false
       - key: OKTA_AUDIENCE
         sync: false

@@ -43,14 +43,15 @@ Without `OKTA_ISSUER`/`OKTA_AUDIENCE` set, a server returns `500` on every `/mcp
 
 ## Okta setup (per server)
 
-Each server needs its own Custom Authorization Server issuer + audience — this repo assumes you already have the 4 auth servers and scopes from the ProGearSalesAI setup (`inventory:*`, `customer:*`, `sales:*`, `pricing:*`). Set per server:
+Each server needs its own Custom Authorization Server issuer + audience — this repo assumes you already have the 4 auth servers and scopes from the ProGearSalesAI setup (`inventory:*`, `customer:*`, `sales:*`, `pricing:*`). Set `OKTA_DOMAIN` once (same value for all 4 services) plus `OKTA_AUTH_SERVER_ID` + `OKTA_AUDIENCE` per service, using that domain's existing values:
 
 ```
-OKTA_ISSUER=https://your-org.okta.com/oauth2/<authServerId>
+OKTA_DOMAIN=https://your-org.okta.com          # same for all 4 services
+OKTA_AUTH_SERVER_ID=<that domain's auth server id>   # e.g. your OKTA_CUSTOMER_AUTH_SERVER_ID's value, on the mcp-customer service
 OKTA_AUDIENCE=api://progear-<domain>
 ```
 
-See `.env.example` for the full list. Tokens are validated by signature + issuer + audience against Okta's JWKS endpoint (`jose`'s `createRemoteJWKSet`) — no shared secret needed on this side.
+(Alternatively, set `OKTA_ISSUER` directly as a full URL — it takes precedence over `OKTA_DOMAIN`/`OKTA_AUTH_SERVER_ID`.) See `.env.example` for the full list, including which vars from a ProGearSalesAI-style `.env` don't apply here (Anthropic key, CORS, the AI Agent's own private key/client ID — this server validates incoming tokens, it doesn't self-issue any). Tokens are validated by signature + issuer + audience against Okta's JWKS endpoint (`jose`'s `createRemoteJWKSet`) — no shared secret needed on this side.
 
 ## Deploying to Render
 

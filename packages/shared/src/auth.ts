@@ -23,6 +23,23 @@ function getJwks(issuer: string) {
 }
 
 /**
+ * Resolves the Okta issuer for this service. Accepts either a full
+ * OKTA_ISSUER, or OKTA_DOMAIN + OKTA_AUTH_SERVER_ID (matching the naming
+ * convention already used per-domain in the original ProGearSalesAI env
+ * vars, e.g. OKTA_CUSTOMER_AUTH_SERVER_ID — just set the plain
+ * OKTA_AUTH_SERVER_ID per service to that domain's value).
+ */
+function resolveIssuer(): string | undefined {
+  if (process.env.OKTA_ISSUER) return process.env.OKTA_ISSUER;
+  const domain = process.env.OKTA_DOMAIN;
+  const authServerId = process.env.OKTA_AUTH_SERVER_ID;
+  if (domain && authServerId) {
+    return `${domain.replace(/\/$/, '')}/oauth2/${authServerId}`;
+  }
+  return undefined;
+}
+
+/**
  * Express middleware: validates the Okta access token (signature, issuer,
  * audience) for every request to /mcp and makes its granted scopes
  * available to tool handlers via `assertScope`/`hasScope`.
@@ -31,18 +48,20 @@ function getJwks(issuer: string) {
  * — it grants every scope with no token check.
  */
 export function bearerAuth() {
-  const issuer = process.env.OKTA_ISSUER;
+  const issuer = resolveIssuer();
   const audience = process.env.OKTA_AUDIENCE;
   const allowInsecure = process.env.ALLOW_INSECURE === 'true';
 
   return async (req: Request, res: Response, next: NextFunction) => {
     if (!issuer || !audience) {
       if (allowInsecure) {
-        console.warn('[auth] OKTA_ISSUER/OKTA_AUDIENCE not set — ALLOW_INSECURE bypass is active');
+        console.warn('[auth] Okta issuer/audience not set — ALLOW_INSECURE bypass is active');
         authStorage.run({ payload: {}, scopes: ['*'] }, next);
         return;
       }
-      res.status(500).json({ error: 'Server misconfigured: set OKTA_ISSUER and OKTA_AUDIENCE' });
+      res.status(500).json({
+        error: 'Server misconfigured: set OKTA_AUDIENCE and either OKTA_ISSUER or OKTA_DOMAIN + OKTA_AUTH_SERVER_ID',
+      });
       return;
     }
 
