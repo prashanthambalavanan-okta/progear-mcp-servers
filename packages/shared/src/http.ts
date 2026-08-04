@@ -1,14 +1,23 @@
 import express, { type Express } from 'express';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
-import { bearerAuth } from './auth.js';
+import { bearerAuth, type AuthOptions } from './auth.js';
 
 /**
  * Builds a stateless Streamable-HTTP MCP app: every POST /mcp gets a fresh
  * McpServer + transport pair (no session map to manage), which is the
  * simplest correct shape for a small tools server like this one.
+ *
+ * Pass `auth` with explicit issuer/domain+authServerId/audience when this
+ * app will be mounted alongside other domains in one process (see
+ * packages/gateway); omit it to fall back to this domain's env vars for a
+ * standalone deployment.
  */
-export function buildMcpApp(opts: { serviceName: string; buildServer: () => McpServer }): Express {
+export function buildMcpApp(opts: {
+  serviceName: string;
+  buildServer: () => McpServer;
+  auth?: AuthOptions;
+}): Express {
   const app = express();
   app.use(express.json());
 
@@ -16,7 +25,7 @@ export function buildMcpApp(opts: { serviceName: string; buildServer: () => McpS
     res.json({ status: 'healthy', service: opts.serviceName });
   });
 
-  app.post('/mcp', bearerAuth(), async (req, res) => {
+  app.post('/mcp', bearerAuth(opts.auth), async (req, res) => {
     const server = opts.buildServer();
     const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
 

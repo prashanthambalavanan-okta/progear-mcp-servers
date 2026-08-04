@@ -1,60 +1,27 @@
 services:
   - type: web
-    name: progear-mcp-inventory
+    name: progear-mcp-gateway
     runtime: node
     plan: starter
-    buildCommand: npm install && npm run build -w packages/mcp-inventory
-    startCommand: node packages/mcp-inventory/dist/server.js
+    buildCommand: npm install && npm run build
+    startCommand: node packages/gateway/dist/server.js
     healthCheckPath: /health
     envVars:
       - key: OKTA_DOMAIN
         sync: false
-      - key: OKTA_AUTH_SERVER_ID
+      - key: OKTA_INVENTORY_AUTH_SERVER_ID
         sync: false
-      - key: OKTA_AUDIENCE
+      - key: OKTA_INVENTORY_AUDIENCE
         sync: false
-
-  - type: web
-    name: progear-mcp-customer
-    runtime: node
-    plan: starter
-    buildCommand: npm install && npm run build -w packages/mcp-customer
-    startCommand: node packages/mcp-customer/dist/server.js
-    healthCheckPath: /health
-    envVars:
-      - key: OKTA_DOMAIN
+      - key: OKTA_CUSTOMER_AUTH_SERVER_ID
         sync: false
-      - key: OKTA_AUTH_SERVER_ID
+      - key: OKTA_CUSTOMER_AUDIENCE
         sync: false
-      - key: OKTA_AUDIENCE
+      - key: OKTA_SALES_AUTH_SERVER_ID
         sync: false
-
-  - type: web
-    name: progear-mcp-sales
-    runtime: node
-    plan: starter
-    buildCommand: npm install && npm run build -w packages/mcp-sales
-    startCommand: node packages/mcp-sales/dist/server.js
-    healthCheckPath: /health
-    envVars:
-      - key: OKTA_DOMAIN
+      - key: OKTA_SALES_AUDIENCE
         sync: false
-      - key: OKTA_AUTH_SERVER_ID
+      - key: OKTA_PRICING_AUTH_SERVER_ID
         sync: false
-      - key: OKTA_AUDIENCE
-        sync: false
-
-  - type: web
-    name: progear-mcp-pricing
-    runtime: node
-    plan: starter
-    buildCommand: npm install && npm run build -w packages/mcp-pricing
-    startCommand: node packages/mcp-pricing/dist/server.js
-    healthCheckPath: /health
-    envVars:
-      - key: OKTA_DOMAIN
-        sync: false
-      - key: OKTA_AUTH_SERVER_ID
-        sync: false
-      - key: OKTA_AUDIENCE
+      - key: OKTA_PRICING_AUDIENCE
         sync: false

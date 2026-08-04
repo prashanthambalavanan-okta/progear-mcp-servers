@@ -1,19 +1,23 @@
 # ProGear MCP Servers
 
-Four standalone MCP servers for the ProGear basketball-equipment demo — Inventory, Customer, Sales, and Pricing — each speaking the real MCP protocol (Streamable HTTP transport) and secured by **your own Okta org** (one Custom Authorization Server + scope set per domain).
+One MCP gateway for the ProGear basketball-equipment demo, hosting four domains — Inventory, Customer, Sales, and Pricing — each speaking the real MCP protocol (Streamable HTTP transport) and secured by **your own Okta org** (its own Custom Authorization Server + scope set per domain).
 
 This is a deliberately smaller sibling of [`ProGearSalesAI`](https://github.com/oktaforai-okta/ProGearSalesAI): no Auth0 FGA, no ID-JAG token exchange, no LangGraph orchestrator, no frontend. Just tools an agent can call directly, gated by a normal OAuth bearer token + scope check against Okta.
 
-## Servers & scopes
+## Deployment shape
 
-| Server | Scopes | Tools |
+**One process, one Render service, one build/start command.** `packages/gateway` mounts all 4 domains at different paths behind a single Express app:
+
+| Mount | Scopes | Tools |
 |---|---|---|
-| `mcp-inventory` | `inventory:read`, `inventory:write`, `inventory:alert` | `list_products`, `search_inventory`, `check_stock`, `get_low_stock_alerts`, `get_inventory_summary`, `update_inventory_quantity` |
-| `mcp-customer` | `customer:read`, `customer:lookup`, `customer:history` | `get_customer`, `search_customers`, `get_customers_by_tier`, `get_top_customers`, `get_customer_summary` |
-| `mcp-sales` | `sales:read`, `sales:quote`, `sales:order` | `list_orders`, `get_order`, `get_pipeline`, `create_quote`, `create_order`, `cancel_order` |
-| `mcp-pricing` | `pricing:read`, `pricing:margin`, `pricing:discount` | `get_price`, `get_category_pricing`, `calculate_bulk_price`, `get_discount_structure` |
+| `/inventory/mcp` | `inventory:read`, `inventory:write`, `inventory:alert` | `list_products`, `search_inventory`, `check_stock`, `get_low_stock_alerts`, `get_inventory_summary`, `update_inventory_quantity` |
+| `/customer/mcp` | `customer:read`, `customer:lookup`, `customer:history` | `get_customer`, `search_customers`, `get_customers_by_tier`, `get_top_customers`, `get_customer_summary` |
+| `/sales/mcp` | `sales:read`, `sales:quote`, `sales:order` | `list_orders`, `get_order`, `get_pipeline`, `create_quote`, `create_order`, `cancel_order` |
+| `/pricing/mcp` | `pricing:read`, `pricing:margin`, `pricing:discount` | `get_price`, `get_category_pricing`, `calculate_bulk_price`, `get_discount_structure` |
 
-Each tool call checks its required scope against the granted scopes in the caller's Okta access token — a token missing `inventory:write` can call `check_stock` but not `update_inventory_quantity`.
+Each mount validates against its **own** Okta Custom Authorization Server (different issuer/audience per domain) even though they all run in the same process — a token issued for the inventory auth server can't be used against `/customer/mcp`, and within a mount, each tool call checks its required scope against the granted scopes in the caller's token (a token missing `inventory:write` can call `check_stock` but not `update_inventory_quantity`).
+
+`packages/mcp-inventory`, `mcp-customer`, `mcp-sales`, `mcp-pricing` also still work as **standalone** servers (their own `server.ts` + `/mcp` + `/health`, single-domain env vars) if you ever want to split them back into separate deployments — the gateway just imports each one's tool-registration logic (`./tools` export) and mounts it under its own auth config instead of calling `.listen()` itself.
 
 ## Data
 
@@ -23,59 +27,68 @@ Seeded from a ported snapshot of the ProGearSalesAI demo dataset: 90 inventory S
 
 ```
 packages/
-  shared/           # ported data + store, JWKS auth + scope enforcement, HTTP/MCP transport helper
-  mcp-inventory/     mcp-customer/     mcp-sales/     mcp-pricing/
+  shared/            # ported data + store, JWKS auth + scope enforcement, HTTP/MCP transport helper
+  mcp-inventory/      mcp-customer/      mcp-sales/      mcp-pricing/   # tool definitions + standalone entrypoint each
+  gateway/            # the actual deployment: mounts all 4 at /inventory, /customer, /sales, /pricing
 ```
 
 ## Local development
 
 ```bash
 npm install
-npm run build                    # builds shared + all 4 servers
+npm run build            # builds shared + all 4 domains + gateway, in dependency order
 
-npm run dev:inventory             # tsx watch, defaults to port 3001
-npm run dev:customer               # port 3002
-npm run dev:sales                  # port 3003
-npm run dev:pricing                 # port 3004
+npm run dev:gateway       # tsx watch, all 4 mounts on one port (default 3000)
 ```
 
-Without `OKTA_ISSUER`/`OKTA_AUDIENCE` set, a server returns `500` on every `/mcp` request unless you set `ALLOW_INSECURE=true`, which skips token validation and grants every scope — local dev only, never set this in a deployed environment.
+Without the relevant Okta env vars set for a mount, that mount returns `500` on every `/mcp` request unless you set `ALLOW_INSECURE=true`, which skips token validation and grants every scope on every mount — local dev only, never set this in a deployed environment.
 
-## Okta setup (per server)
+## Okta setup
 
-Each server needs its own Custom Authorization Server issuer + audience — this repo assumes you already have the 4 auth servers and scopes from the ProGearSalesAI setup (`inventory:*`, `customer:*`, `sales:*`, `pricing:*`). Set `OKTA_DOMAIN` once (same value for all 4 services) plus `OKTA_AUTH_SERVER_ID` + `OKTA_AUDIENCE` per service, using that domain's existing values:
+Set `OKTA_DOMAIN` once, plus `OKTA_<DOMAIN>_AUTH_SERVER_ID` + `OKTA_<DOMAIN>_AUDIENCE` per domain — these are the **exact same env var names** already used in the ProGearSalesAI backend (`OKTA_CUSTOMER_AUTH_SERVER_ID`, `OKTA_INVENTORY_AUDIENCE`, etc.), so existing values can be copied over as-is:
 
 ```
-OKTA_DOMAIN=https://your-org.okta.com          # same for all 4 services
-OKTA_AUTH_SERVER_ID=<that domain's auth server id>   # e.g. your OKTA_CUSTOMER_AUTH_SERVER_ID's value, on the mcp-customer service
-OKTA_AUDIENCE=api://progear-<domain>
+OKTA_DOMAIN=https://your-org.okta.com
+
+OKTA_INVENTORY_AUTH_SERVER_ID=...   OKTA_INVENTORY_AUDIENCE=api://progear-inventory
+OKTA_CUSTOMER_AUTH_SERVER_ID=...    OKTA_CUSTOMER_AUDIENCE=api://progear-customer
+OKTA_SALES_AUTH_SERVER_ID=...       OKTA_SALES_AUDIENCE=api://progear-sales
+OKTA_PRICING_AUTH_SERVER_ID=...     OKTA_PRICING_AUDIENCE=api://progear-pricing
 ```
 
-(Alternatively, set `OKTA_ISSUER` directly as a full URL — it takes precedence over `OKTA_DOMAIN`/`OKTA_AUTH_SERVER_ID`.) See `.env.example` for the full list, including which vars from a ProGearSalesAI-style `.env` don't apply here (Anthropic key, CORS, the AI Agent's own private key/client ID — this server validates incoming tokens, it doesn't self-issue any). Tokens are validated by signature + issuer + audience against Okta's JWKS endpoint (`jose`'s `createRemoteJWKSet`) — no shared secret needed on this side.
+See `.env.example` for the full list, including which vars from a ProGearSalesAI-style `.env` don't apply here (Anthropic key, CORS, the AI Agent's own private key/client ID — this gateway validates incoming tokens, it doesn't self-issue any). Tokens are validated by signature + issuer + audience against each domain's own Okta JWKS endpoint (`jose`'s `createRemoteJWKSet`) — no shared secret needed on this side.
 
 ## Deploying to Render
 
-`render.yaml` defines all 4 services as a Render Blueprint:
+Single service, either via the dashboard or the included Blueprint.
 
-```bash
-# from the Render dashboard: New > Blueprint > point at this repo
-```
+**Manual (New → Web Service):**
 
-Render will build/deploy all 4 services from one repo. After creating them, set `OKTA_ISSUER` and `OKTA_AUDIENCE` for each service in the Render dashboard (marked `sync: false` in the blueprint, so they're not synced from a shared env group — set them per service).
+| Field | Value |
+|---|---|
+| Language | Node |
+| Root Directory | *(blank — npm workspaces monorepo, build runs from repo root)* |
+| Build Command | `npm install && npm run build` |
+| Start Command | `node packages/gateway/dist/server.js` |
+| Health Check Path | `/health` |
+
+**Blueprint:** `render.yaml` at the repo root defines the same single `progear-mcp-gateway` service — New → Blueprint, point at this repo, then fill in the 9 Okta env vars it prompts for (marked `sync: false`).
 
 ## Connecting an agent
 
-Each deployed server exposes MCP over Streamable HTTP at `POST/GET/DELETE /mcp` (stateless — no session persistence across requests) and a plain `GET /health`.
+Each mount exposes MCP over Streamable HTTP at `POST/GET/DELETE <mount>/mcp` (stateless — no session persistence across requests) plus its own `GET <mount>/health`; there's also a top-level `GET /health` listing all mounts.
 
 Get an access token from Okta for the relevant Custom Authorization Server + scopes (e.g. client-credentials grant for a service/agent identity), then:
 
 **Claude Code CLI:**
 ```bash
 claude mcp add --transport http progear-inventory \
-  https://progear-mcp-inventory.onrender.com/mcp \
+  https://<your-render-url>/inventory/mcp \
   --header "Authorization: Bearer <token>"
 ```
 
-**Any other MCP client / agent SDK:** point it at the server's `/mcp` URL with an `Authorization: Bearer <token>` header on every request.
+Repeat per domain (`/customer/mcp`, `/sales/mcp`, `/pricing/mcp`) with a token scoped to that domain's audience.
 
-Claude.ai / Claude Desktop's remote-connector UI expects full OAuth 2.1 discovery (dynamic client registration) for zero-config connect — that's not implemented here since Okta is already the authorization server and tokens are obtained out-of-band. Wiring OAuth discovery metadata onto these servers is a reasonable next step if you want that flow instead of a static bearer token.
+**Any other MCP client / agent SDK:** point it at the mount's `/mcp` URL with an `Authorization: Bearer <token>` header on every request.
+
+Claude.ai / Claude Desktop's remote-connector UI expects full OAuth 2.1 discovery (dynamic client registration) for zero-config connect — that's not implemented here since Okta is already the authorization server and tokens are obtained out-of-band. Wiring OAuth discovery metadata onto these mounts is a reasonable next step if you want that flow instead of a static bearer token.

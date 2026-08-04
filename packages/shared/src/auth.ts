@@ -7,6 +7,18 @@ interface AuthContext {
   scopes: string[];
 }
 
+export interface AuthOptions {
+  /** Full issuer URL. Takes precedence over domain/authServerId. */
+  issuer?: string;
+  /** Okta org domain, e.g. https://your-org.okta.com — combined with authServerId if issuer isn't set. */
+  domain?: string;
+  /** Custom Authorization Server ID for this domain. */
+  authServerId?: string;
+  audience?: string;
+  /** Skip token validation entirely and grant every scope — local dev only. */
+  allowInsecure?: boolean;
+}
+
 const authStorage = new AsyncLocalStorage<AuthContext>();
 
 function scopesOf(payload: JWTPayload): string[] {
@@ -16,26 +28,34 @@ function scopesOf(payload: JWTPayload): string[] {
   return [];
 }
 
-let jwks: ReturnType<typeof createRemoteJWKSet> | undefined;
+// Keyed by issuer, since one process can host several domains (each with its
+// own Okta Custom Authorization Server / JWKS) behind a single gateway.
+const jwksCache = new Map<string, ReturnType<typeof createRemoteJWKSet>>();
 function getJwks(issuer: string) {
-  if (!jwks) jwks = createRemoteJWKSet(new URL(`${issuer.replace(/\/$/, '')}/v1/keys`));
+  let jwks = jwksCache.get(issuer);
+  if (!jwks) {
+    jwks = createRemoteJWKSet(new URL(`${issuer.replace(/\/$/, '')}/v1/keys`));
+    jwksCache.set(issuer, jwks);
+  }
   return jwks;
 }
 
 /**
- * Resolves the Okta issuer for this service. Accepts either a full
- * OKTA_ISSUER, or OKTA_DOMAIN + OKTA_AUTH_SERVER_ID (matching the naming
- * convention already used per-domain in the original ProGearSalesAI env
- * vars, e.g. OKTA_CUSTOMER_AUTH_SERVER_ID — just set the plain
- * OKTA_AUTH_SERVER_ID per service to that domain's value).
+ * Resolves an issuer from explicit options, falling back to env vars
+ * (OKTA_ISSUER, or OKTA_DOMAIN + OKTA_AUTH_SERVER_ID) when running a single
+ * domain standalone — matches the per-domain Okta Custom Authorization
+ * Server naming already used in the ProGearSalesAI env vars (e.g.
+ * OKTA_CUSTOMER_AUTH_SERVER_ID — pass that value as `authServerId`).
  */
-function resolveIssuer(): string | undefined {
+function resolveIssuer(opts: AuthOptions): string | undefined {
+  if (opts.issuer) return opts.issuer;
+  if (opts.domain && opts.authServerId) {
+    return `${opts.domain.replace(/\/$/, '')}/oauth2/${opts.authServerId}`;
+  }
   if (process.env.OKTA_ISSUER) return process.env.OKTA_ISSUER;
   const domain = process.env.OKTA_DOMAIN;
   const authServerId = process.env.OKTA_AUTH_SERVER_ID;
-  if (domain && authServerId) {
-    return `${domain.replace(/\/$/, '')}/oauth2/${authServerId}`;
-  }
+  if (domain && authServerId) return `${domain.replace(/\/$/, '')}/oauth2/${authServerId}`;
   return undefined;
 }
 
@@ -44,13 +64,18 @@ function resolveIssuer(): string | undefined {
  * audience) for every request to /mcp and makes its granted scopes
  * available to tool handlers via `assertScope`/`hasScope`.
  *
- * Set ALLOW_INSECURE=true only for local dev without an Okta org configured
- * — it grants every scope with no token check.
+ * Pass explicit `issuer`/`domain`+`authServerId`/`audience` when this
+ * process hosts more than one domain (see packages/gateway); omit them to
+ * fall back to OKTA_ISSUER / OKTA_DOMAIN+OKTA_AUTH_SERVER_ID / OKTA_AUDIENCE
+ * env vars for a single-domain standalone deployment.
+ *
+ * Set allowInsecure (or ALLOW_INSECURE=true) only for local dev without an
+ * Okta org configured — it grants every scope with no token check.
  */
-export function bearerAuth() {
-  const issuer = resolveIssuer();
-  const audience = process.env.OKTA_AUDIENCE;
-  const allowInsecure = process.env.ALLOW_INSECURE === 'true';
+export function bearerAuth(opts: AuthOptions = {}) {
+  const issuer = resolveIssuer(opts);
+  const audience = opts.audience ?? process.env.OKTA_AUDIENCE;
+  const allowInsecure = opts.allowInsecure ?? process.env.ALLOW_INSECURE === 'true';
 
   return async (req: Request, res: Response, next: NextFunction) => {
     if (!issuer || !audience) {
@@ -60,7 +85,7 @@ export function bearerAuth() {
         return;
       }
       res.status(500).json({
-        error: 'Server misconfigured: set OKTA_AUDIENCE and either OKTA_ISSUER or OKTA_DOMAIN + OKTA_AUTH_SERVER_ID',
+        error: 'Server misconfigured: set audience and either issuer or domain + authServerId',
       });
       return;
     }

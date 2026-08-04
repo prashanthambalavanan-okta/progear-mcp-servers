@@ -1,22 +1,20 @@
 {
-  "name": "@progear/mcp-sales",
+  "name": "@progear/gateway",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "exports": {
-    ".": "./dist/server.js",
-    "./tools": "./dist/tools.js"
-  },
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "tsc -p tsconfig.json",
     "start": "node dist/server.js"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.0.0",
+    "@progear/mcp-customer": "*",
+    "@progear/mcp-inventory": "*",
+    "@progear/mcp-pricing": "*",
+    "@progear/mcp-sales": "*",
     "@progear/shared": "*",
-    "express": "^4.21.0",
-    "zod": "^3.23.0"
+    "express": "^4.21.0"
   },
   "devDependencies": {
     "@types/express": "^4.17.21",
