@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { SignJWT, decodeJwt, importJWK, type JWK } from 'jose';
+import { UpstreamHttpError } from './httpError.js';
 
 /**
  * Raw HTTP implementation of the Identity Assertion Authorization Grant
@@ -40,7 +41,7 @@ async function postForm(endpoint: string, params: Record<string, string>): Promi
   });
   const json = await res.json().catch(() => ({}));
   if (!res.ok) {
-    throw new Error(`Request to ${endpoint} failed (${res.status}): ${JSON.stringify(json)}`);
+    throw new UpstreamHttpError(endpoint, res.status, json);
   }
   return json;
 }

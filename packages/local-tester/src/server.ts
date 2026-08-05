@@ -9,7 +9,11 @@ import { generatePkce, randomState } from './pkce.js';
 import { dashboardPage, errorPage, loginPage, resultPage } from './views.js';
 
 const app = express();
+app.set('trust proxy', 1);
 app.use(cookieParser());
+app.use(express.urlencoded({ extended: false }));
+
+const isProduction = process.env.NODE_ENV === 'production';
 
 // Short-lived, in-memory only — this app never persists anything to disk.
 const pendingLogins = new Map<string, { verifier: string }>();
@@ -22,7 +26,7 @@ app.get('/', (req, res) => {
     res.send(loginPage());
     return;
   }
-  res.send(dashboardPage(session.claims, DOMAINS.map((d) => ({ key: d.key, label: d.label }))));
+  res.send(dashboardPage(session.claims, DOMAINS));
 });
 
 app.get('/login', (_req, res) => {
@@ -79,7 +83,7 @@ app.get('/callback', async (req, res) => {
 
     const sid = randomUUID();
     sessions.set(sid, { idToken, claims });
-    res.cookie('sid', sid, { httpOnly: true, sameSite: 'lax' });
+    res.cookie('sid', sid, { httpOnly: true, sameSite: 'lax', secure: isProduction });
     res.redirect('/');
   } catch (err) {
     res.status(500).send(errorPage('exchanging authorization code', err));
@@ -93,7 +97,7 @@ app.get('/logout', (req, res) => {
   res.redirect('/');
 });
 
-app.post('/invoke/:domain', async (req, res) => {
+app.post('/invoke/:domain/:tool', async (req, res) => {
   const sid = req.cookies?.sid;
   const session = sid ? sessions.get(sid) : undefined;
   if (!session) {
@@ -104,6 +108,24 @@ app.post('/invoke/:domain', async (req, res) => {
   const domain = DOMAINS.find((d) => d.key === req.params.domain);
   if (!domain) {
     res.status(404).send(errorPage('invoke', `Unknown domain: ${req.params.domain}`));
+    return;
+  }
+
+  const tool = domain.tools.find((t) => t.name === req.params.tool);
+  if (!tool) {
+    res.status(404).send(errorPage('invoke', `Unknown tool for ${domain.label}: ${req.params.tool}`));
+    return;
+  }
+
+  let toolArguments: Record<string, unknown>;
+  try {
+    const parsed = JSON.parse(String(req.body.arguments ?? '{}'));
+    if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+      throw new Error('Arguments must be a JSON object.');
+    }
+    toolArguments = parsed;
+  } catch (err) {
+    res.status(400).send(errorPage(`parsing arguments for ${tool.name}`, err));
     return;
   }
 
@@ -118,11 +140,11 @@ app.post('/invoke/:domain', async (req, res) => {
       agentPrivateJwk: config.agentPrivateJwk(),
     });
 
-    const toolResult = await callMcpTool({
+    const rawResponse = await callMcpTool({
       mcpUrl: `${config.gatewayBaseUrl}/${domain.key}/mcp`,
       accessToken: accessToken.accessToken,
-      toolName: domain.demoTool.name,
-      toolArguments: domain.demoTool.arguments,
+      toolName: tool.name,
+      toolArguments,
     });
 
     const expectedAudience = domainAudience(domain);
@@ -131,16 +153,20 @@ app.post('/invoke/:domain', async (req, res) => {
     res.send(
       resultPage({
         domainLabel: domain.label,
+        toolName: tool.name,
+        toolArguments,
+        idToken: session.idToken,
         idTokenClaims: session.claims,
+        idJagToken: idJag.idJagToken,
         idJagClaims: idJag.idJagClaims,
+        domainAccessToken: accessToken.accessToken,
         accessClaims: accessToken.accessClaims,
         audienceCheck: {
           expected: expectedAudience,
           actual: actualAudience,
           match: actualAudience === expectedAudience,
         },
-        toolCall: domain.demoTool,
-        toolResult,
+        rawResponse,
       }),
     );
   } catch (err) {

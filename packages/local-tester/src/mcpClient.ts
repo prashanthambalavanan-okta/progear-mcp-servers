@@ -1,4 +1,15 @@
 import { randomUUID } from 'node:crypto';
+import { UpstreamHttpError } from './httpError.js';
+
+export interface JsonRpcToolCallResponse {
+  jsonrpc: string;
+  id: string;
+  result?: {
+    content?: Array<{ type: string; text?: string }>;
+    isError?: boolean;
+  };
+  error?: { code: number; message: string; data?: unknown };
+}
 
 /** Minimal client for one JSON-RPC call against a Streamable-HTTP MCP endpoint. */
 export async function callMcpTool(opts: {
@@ -6,7 +17,7 @@ export async function callMcpTool(opts: {
   accessToken: string;
   toolName: string;
   toolArguments: Record<string, unknown>;
-}): Promise<unknown> {
+}): Promise<JsonRpcToolCallResponse> {
   const res = await fetch(opts.mcpUrl, {
     method: 'POST',
     headers: {
@@ -26,7 +37,13 @@ export async function callMcpTool(opts: {
   const text = await res.text();
 
   if (!res.ok) {
-    throw new Error(`MCP call failed (${res.status}): ${text}`);
+    let body: unknown = text;
+    try {
+      body = JSON.parse(text);
+    } catch {
+      // leave body as raw text
+    }
+    throw new UpstreamHttpError(opts.mcpUrl, res.status, body);
   }
 
   if (contentType.includes('text/event-stream')) {

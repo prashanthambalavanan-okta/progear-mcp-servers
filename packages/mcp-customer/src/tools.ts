@@ -6,6 +6,7 @@ const SCOPES = {
   read: 'customer:read',
   lookup: 'customer:lookup',
   history: 'customer:history',
+  write: 'customer:write',
 };
 
 function json(data: unknown) {
@@ -78,6 +79,37 @@ export function buildServer(): McpServer {
       const check = assertScope(SCOPES.history);
       if (!check.ok) return scopeError(check.message);
       return json(demoStore.getCustomerSummary());
+    },
+  );
+
+  server.tool(
+    'add_customer',
+    'Add a new customer account.',
+    {
+      name: z.string().describe('Customer or company name'),
+      contact: z.string().describe('Primary contact name'),
+      email: z.string().describe('Contact email'),
+      tier: z.enum(['Platinum', 'Gold', 'Silver', 'Bronze']),
+      location: z.string().describe('City, state'),
+      total_spent: z.number().nonnegative().default(0),
+    },
+    async (input) => {
+      const check = assertScope(SCOPES.write);
+      if (!check.ok) return scopeError(check.message);
+      return json(demoStore.addCustomer(input));
+    },
+  );
+
+  server.tool(
+    'delete_customer',
+    'Remove a customer account.',
+    { customerId: z.string().describe('Customer ID, e.g. "CUST-001"') },
+    async ({ customerId }) => {
+      const check = assertScope(SCOPES.write);
+      if (!check.ok) return scopeError(check.message);
+      const result = demoStore.deleteCustomer(customerId);
+      if ('error' in result) return scopeError(result.error);
+      return json(result);
     },
   );
 

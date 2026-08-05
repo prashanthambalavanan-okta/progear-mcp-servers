@@ -96,5 +96,39 @@ export function buildServer(): McpServer {
     },
   );
 
+  server.tool(
+    'add_inventory_item',
+    'Add a brand-new product to inventory, with its price and cost.',
+    {
+      sku: z.string().describe('New, unique product SKU, e.g. "BB-NEW-001"'),
+      name: z.string().describe('Product name'),
+      category: z.string().describe('Category, e.g. "Basketballs" or "Hoops"'),
+      quantity: z.number().int().describe('Starting stock quantity'),
+      reorder_point: z.number().int().describe('Quantity at or below which the item is low stock'),
+      price: z.number().positive().describe('Sale price'),
+      cost: z.number().positive().describe('Unit cost'),
+    },
+    async (input) => {
+      const check = assertScope(SCOPES.write);
+      if (!check.ok) return scopeError(check.message);
+      const result = demoStore.addInventoryItem(input);
+      if ('error' in result) return scopeError(result.error);
+      return json(result);
+    },
+  );
+
+  server.tool(
+    'delete_inventory_item',
+    'Remove a product from inventory entirely.',
+    { sku: z.string().describe('Product SKU to remove') },
+    async ({ sku }) => {
+      const check = assertScope(SCOPES.write);
+      if (!check.ok) return scopeError(check.message);
+      const result = demoStore.deleteInventoryItem(sku);
+      if ('error' in result) return scopeError(result.error);
+      return json(result);
+    },
+  );
+
   return server;
 }

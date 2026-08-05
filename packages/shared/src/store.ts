@@ -21,6 +21,7 @@ class DemoStore {
   private pricing: Record<string, PricingEntry>;
   private customers: Record<string, Customer>;
   private discounts: Discounts;
+  private customerSeq: number;
 
   constructor() {
     this.inventory = Object.fromEntries(
@@ -29,6 +30,16 @@ class DemoStore {
     this.pricing = { ...initialData.pricing };
     this.customers = { ...initialData.customers };
     this.discounts = initialData.discounts;
+
+    this.customerSeq = Object.keys(this.customers).reduce((max, id) => {
+      const match = /^CUST-(\d+)$/.exec(id);
+      return match ? Math.max(max, Number(match[1])) : max;
+    }, 0);
+  }
+
+  private nextCustomerId(): string {
+    this.customerSeq += 1;
+    return `CUST-${String(this.customerSeq).padStart(3, '0')}`;
   }
 
   // ==================== INVENTORY ====================
@@ -114,6 +125,44 @@ class DemoStore {
       change: item.quantity - previousQuantity,
       status: item.status,
     };
+  }
+
+  addInventoryItem(input: {
+    sku: string;
+    name: string;
+    category: string;
+    quantity: number;
+    reorder_point: number;
+    price: number;
+    cost: number;
+  }): InventoryItem | { error: string } {
+    if (this.inventory[input.sku]) {
+      return { error: `SKU already exists: ${input.sku}` };
+    }
+
+    const item: InventoryItem = {
+      sku: input.sku,
+      name: input.name,
+      category: input.category,
+      quantity: input.quantity,
+      reorder_point: input.reorder_point,
+      status: input.quantity <= input.reorder_point ? 'low' : 'good',
+    };
+    this.inventory[input.sku] = item;
+    this.pricing[input.sku] = {
+      price: input.price,
+      cost: input.cost,
+      margin: Math.round(((input.price - input.cost) / input.price) * 1000) / 10,
+    };
+
+    return item;
+  }
+
+  deleteInventoryItem(sku: string): { ok: true } | { error: string } {
+    if (!this.inventory[sku]) return { error: `Product not found: ${sku}` };
+    delete this.inventory[sku];
+    delete this.pricing[sku];
+    return { ok: true };
   }
 
   getInventorySummary(): InventorySummary {
@@ -219,6 +268,33 @@ class DemoStore {
         c.contact.toLowerCase().includes(queryLower) ||
         c.location.toLowerCase().includes(queryLower),
     );
+  }
+
+  addCustomer(input: {
+    name: string;
+    contact: string;
+    email: string;
+    tier: Customer['tier'];
+    location: string;
+    total_spent?: number;
+  }): Customer {
+    const customer: Customer = {
+      id: this.nextCustomerId(),
+      name: input.name,
+      contact: input.contact,
+      email: input.email,
+      tier: input.tier,
+      location: input.location,
+      total_spent: input.total_spent ?? 0,
+    };
+    this.customers[customer.id] = customer;
+    return customer;
+  }
+
+  deleteCustomer(id: string): { ok: true } | { error: string } {
+    if (!this.customers[id]) return { error: `Customer not found: ${id}` };
+    delete this.customers[id];
+    return { ok: true };
   }
 
   getCustomerSummary(): CustomerSummary {
