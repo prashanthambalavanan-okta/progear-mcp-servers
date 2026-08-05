@@ -18,11 +18,25 @@ This mirrors exactly what `ProGearSalesAI`'s `okta_cross_app_access.py` / `multi
 ```bash
 npm install                     # from repo root
 cp packages/local-tester/.env.example packages/local-tester/.env
-# fill in .env, then, from packages/local-tester:
-npx tsx watch --env-file=.env src/server.ts
+# fill in .env, then:
+npm run dev -w packages/local-tester      # or `npm run dev:tester` from the root
 ```
 
 Open `http://localhost:4000`.
+
+`npm run dev` loads `.env` itself (via Node's `--env-file`), so there's nothing to
+export in your shell first — and exported `OKTA_*` variables actually take
+precedence over `.env`, so a stale value in your shell will silently win. If a var
+looks like it isn't being picked up, check `env | grep OKTA_` in that shell.
+
+Stop the server with **Ctrl-C** in its terminal. Just closing the terminal
+window often leaves the `tsx watch` process tree orphaned and still holding port
+4000 — so `npm run dev` first runs `npm run stop`, which kills whatever is
+listening on `PORT` (default 4000). Run `npm run stop -w packages/local-tester`
+on its own if you need to free the port without starting the server.
+
+`tsx watch` reloads on source edits but **not** on `.env` edits — Node reads
+`--env-file` once at startup. Restart after changing `.env`.
 
 ## Deploying (e.g. to Render)
 

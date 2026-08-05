@@ -4,7 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/server.ts",
+    "predev": "npm run stop --silent",
+    "dev": "tsx watch --env-file=.env src/server.ts",
+    "stop": "lsof -ti:${PORT:-4000} | xargs kill 2>/dev/null; true",
     "build": "tsc -p tsconfig.json",
     "start": "node dist/server.js"
   },
