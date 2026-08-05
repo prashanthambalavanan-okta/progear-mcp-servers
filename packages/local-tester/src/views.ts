@@ -8,7 +8,7 @@ function json(value: unknown): string {
   return escapeHtml(JSON.stringify(value, null, 2));
 }
 
-function page(title: string, body: string): string {
+function page(title: string, body: string, opts: { centered?: boolean } = {}): string {
   return `<!doctype html>
 <html>
 <head>
@@ -42,6 +42,15 @@ function page(title: string, body: string): string {
       min-height: 100vh;
     }
     .container { max-width: 1080px; margin: 0 auto; padding: 40px 24px 80px; }
+    /* Login: one card, centred in the viewport. */
+    .container-center {
+      max-width: none;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
     a { color: var(--accent); }
     h1 { font-size: 24px; margin: 0 0 6px; letter-spacing: -0.01em; }
     h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-dim); margin: 0 0 12px; }
@@ -54,6 +63,9 @@ function page(title: string, body: string): string {
       border-radius: var(--radius);
       padding: 28px;
     }
+    .login-card { width: 100%; max-width: 480px; padding: 40px 36px; text-align: center; }
+    .login-card h1 { font-size: 28px; margin-bottom: 12px; }
+    .login-card p.lede { max-width: none; margin: 0 0 28px; font-size: 14px; }
     a.button, button {
       display: inline-block;
       padding: 9px 16px;
@@ -101,24 +113,41 @@ function page(title: string, body: string): string {
     .pill-match { background: var(--green-dim); color: var(--green); }
     .pill-mismatch { background: var(--red-dim); color: var(--red); }
 
-    .tool-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 16px;
-    }
-    .tool-card {
+    /* One collapsed row per tool, stacked. Summary = name + description;
+       expanding reveals the arguments editor and Run. */
+    .tool-list { display: flex; flex-direction: column; gap: 8px; }
+    .tool-row {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
+      border-radius: 10px;
     }
-    .tool-card .tool-name { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 14px; font-weight: 600; }
-    .tool-card .tool-desc { color: var(--text-dim); font-size: 13px; line-height: 1.4; min-height: 34px; }
-    .tool-card .badges { display: flex; gap: 6px; flex-wrap: wrap; }
-    .tool-card textarea {
+    .tool-row[open] { border-color: var(--accent-dim); }
+    .tool-row > summary {
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px 12px;
+      padding: 14px 18px;
+      margin: 0;
+      color: var(--text);
+      font-size: 14px;
+      border-radius: 10px;
+    }
+    /* Beats the generic details[open] > summary rule further down. */
+    .tool-row[open] > summary { margin: 0; }
+    .tool-row > summary::-webkit-details-marker { display: none; }
+    .tool-row > summary:hover { background: var(--surface-2); }
+    .tool-row > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+    .tool-row .chevron { color: var(--text-dim); flex: none; font-size: 11px; transition: transform 0.15s ease; }
+    .tool-row[open] .chevron { transform: rotate(90deg); }
+    .tool-row .tool-name { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-weight: 600; flex: none; }
+    .tool-row .tool-desc { color: var(--text-dim); font-size: 13px; flex: 1 1 220px; min-width: 0; }
+    .tool-row .badges { display: flex; gap: 6px; flex: none; }
+    .tool-body { padding: 16px 18px 18px; border-top: 1px solid var(--border); }
+    .tool-body label { display: block; font-size: 12px; color: var(--text-dim); margin-bottom: 6px; }
+    .tool-body textarea {
       width: 100%;
       background: var(--surface-2);
       color: var(--text);
@@ -129,8 +158,7 @@ function page(title: string, body: string): string {
       padding: 10px;
       resize: vertical;
     }
-    .tool-card form { display: flex; flex-direction: column; gap: 8px; }
-    .tool-card button { align-self: flex-start; }
+    .tool-body form { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
 
     pre {
       background: var(--surface-2);
@@ -172,7 +200,7 @@ function page(title: string, body: string): string {
   </style>
 </head>
 <body>
-  <div class="container">${body}</div>
+  <div class="container${opts.centered ? ' container-center' : ''}">${body}</div>
   <script>
     function copyText(id, btn) {
       var el = document.getElementById(id);
@@ -206,29 +234,38 @@ function copyRow(idPrefix: string, rawToken: string, decodedClaims: unknown): st
 export function loginPage(): string {
   return page(
     'ProGear MCP',
-    `<div class="card">
+    `<div class="card login-card">
        <h1>ProGear MCP</h1>
        <p class="lede">Sign in, then run any tool across the 4 ProGear MCP servers. Each run performs the real Identity Assertion Authorization Grant (ID-JAG) exchange — your ID token → an ID-JAG → a domain-scoped access token — then calls that tool on the live gateway. No LLM in the loop: every tool maps directly to its arguments and its response.</p>
        <a class="button" href="/login">Sign in with Okta</a>
      </div>`,
+    { centered: true },
   );
 }
 
-function toolCard(domain: DomainConfig, tool: ToolSpec): string {
+/** A collapsed row: name + description in the summary, arguments editor + Run once expanded. */
+function toolRow(domain: DomainConfig, tool: ToolSpec): string {
   const badge = tool.mutates ? '<span class="pill pill-mutate">Mutates</span>' : '<span class="pill pill-read">Read-only</span>';
   const args = escapeHtml(JSON.stringify(tool.defaultArguments, null, 2));
-  return `<article class="tool-card">
-    <div class="tool-name">${escapeHtml(tool.name)}</div>
-    <div class="tool-desc">${escapeHtml(tool.description)}</div>
-    <div class="badges">
-      <span class="pill pill-scope">${escapeHtml(tool.scope)}</span>
-      ${badge}
+  const rows = Math.min(12, Math.max(3, args.split('\n').length));
+  return `<details class="tool-row">
+    <summary>
+      <span class="chevron">▶</span>
+      <span class="tool-name">${escapeHtml(tool.name)}</span>
+      <span class="tool-desc">${escapeHtml(tool.description)}</span>
+      <span class="badges">
+        <span class="pill pill-scope">${escapeHtml(tool.scope)}</span>
+        ${badge}
+      </span>
+    </summary>
+    <div class="tool-body">
+      <form method="post" action="/invoke/${encodeURIComponent(domain.key)}/${encodeURIComponent(tool.name)}">
+        <label>Arguments (JSON)</label>
+        <textarea name="arguments" rows="${rows}" spellcheck="false">${args}</textarea>
+        <button type="submit">Run</button>
+      </form>
     </div>
-    <form method="post" action="/invoke/${encodeURIComponent(domain.key)}/${encodeURIComponent(tool.name)}">
-      <textarea name="arguments" rows="4" spellcheck="false">${args}</textarea>
-      <button type="submit">Run</button>
-    </form>
-  </article>`;
+  </details>`;
 }
 
 export function dashboardPage(user: { sub?: string; email?: string; name?: string }, domains: DomainConfig[]): string {
@@ -239,7 +276,7 @@ export function dashboardPage(user: { sub?: string; email?: string; name?: strin
           <h2>${escapeHtml(d.label)}</h2>
           <div class="domain-scopes">${d.scopes.map((s) => `<span class="pill pill-scope">${escapeHtml(s)}</span>`).join('')}</div>
         </div>
-        <div class="tool-grid">${d.tools.map((t) => toolCard(d, t)).join('')}</div>
+        <div class="tool-list">${d.tools.map((t) => toolRow(d, t)).join('')}</div>
       </section>`,
     )
     .join('');

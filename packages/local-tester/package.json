@@ -6,7 +6,7 @@
   "scripts": {
     "predev": "npm run stop --silent",
     "dev": "tsx watch --env-file=.env src/server.ts",
-    "stop": "lsof -ti:${PORT:-4000} | xargs kill 2>/dev/null; true",
+    "stop": "lsof -ti:${PORT:-4000} | xargs kill 2>/dev/null; pkill -f 'tsx watch --env-file=[.]env src/server.ts' 2>/dev/null; true",
     "build": "tsc -p tsconfig.json",
     "start": "node dist/server.js"
   },

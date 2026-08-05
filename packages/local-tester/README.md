@@ -31,9 +31,10 @@ looks like it isn't being picked up, check `env | grep OKTA_` in that shell.
 
 Stop the server with **Ctrl-C** in its terminal. Just closing the terminal
 window often leaves the `tsx watch` process tree orphaned and still holding port
-4000 — so `npm run dev` first runs `npm run stop`, which kills whatever is
-listening on `PORT` (default 4000). Run `npm run stop -w packages/local-tester`
-on its own if you need to free the port without starting the server.
+4000 — so `npm run dev` first runs `npm run stop`, which kills both whatever is
+listening on `PORT` (default 4000) and any leftover `tsx watch` supervisor for
+this package. Run `npm run stop -w packages/local-tester` on its own if you need
+to clean up without starting the server.
 
 `tsx watch` reloads on source edits but **not** on `.env` edits — Node reads
 `--env-file` once at startup. Restart after changing `.env`.
