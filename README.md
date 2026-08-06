@@ -92,4 +92,37 @@ Repeat per domain (`/customer/mcp`, `/sales/mcp`, `/pricing/mcp`) with a token s
 
 **Any other MCP client / agent SDK:** point it at the mount's `/mcp` URL with an `Authorization: Bearer <token>` header on every request.
 
-Claude.ai / Claude Desktop's remote-connector UI expects full OAuth 2.1 discovery (dynamic client registration) for zero-config connect — that's not implemented here since Okta is already the authorization server and tokens are obtained out-of-band. Wiring OAuth discovery metadata onto these mounts is a reasonable next step if you want that flow instead of a static bearer token.
+### OAuth discovery (no static token)
+
+Clients that implement the MCP authorization spec can find Okta on their own instead of being handed a token. Each mount publishes [RFC 9728](https://www.rfc-editor.org/rfc/rfc9728) protected-resource metadata at the **root** of the gateway, path-scoped to the endpoint it describes:
+
+```
+GET /.well-known/oauth-protected-resource/inventory/mcp
+GET /.well-known/oauth-protected-resource/customer/mcp
+GET /.well-known/oauth-protected-resource/sales/mcp
+GET /.well-known/oauth-protected-resource/pricing/mcp
+```
+
+```json
+{
+  "resource": "https://<your-render-url>/inventory/mcp",
+  "authorization_servers": ["https://your-org.okta.com/oauth2/<inventory-auth-server-id>"],
+  "scopes_supported": ["inventory:read", "inventory:write", "inventory:alert"],
+  "bearer_methods_supported": ["header"],
+  "resource_name": "ProGear Inventory MCP"
+}
+```
+
+A `401` from `/mcp` now also carries the pointer, so a client that calls the endpoint cold learns where to authenticate:
+
+```
+WWW-Authenticate: Bearer resource_metadata="https://<your-render-url>/.well-known/oauth-protected-resource/inventory/mcp"
+```
+
+(When a token *was* presented but failed validation, the challenge additionally carries `error="invalid_token"` and `error_description`.)
+
+The URLs in these documents are derived from the incoming request (`X-Forwarded-Proto` + `Host`, with `trust proxy` on — correct on Render). Set `PUBLIC_BASE_URL=https://<your-render-url>` only if something in front of the gateway rewrites the `Host` header.
+
+To let a client complete the flow, register an OIDC **public** client (Authorization Code + PKCE) in your Okta org, add the client's redirect URI (Claude.ai uses `https://claude.ai/api/mcp/auth_callback`), and grant the domain's scopes in that Custom Authorization Server's access policy.
+
+**Still missing for fully zero-config connect:** [dynamic client registration](https://www.rfc-editor.org/rfc/rfc7591). Okta's `/oauth2/v1/clients` endpoint requires an SSWS API token, so it can't be advertised for anonymous registration — clients that insist on DCR (VS Code / Copilot today) need a registration shim in front of it. Clients that accept a pre-registered `client_id` can use the discovery above as-is.

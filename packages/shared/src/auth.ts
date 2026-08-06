@@ -1,6 +1,7 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
 import { createRemoteJWKSet, jwtVerify, type JWTPayload } from 'jose';
 import type { NextFunction, Request, Response } from 'express';
+import { resourceMetadataUrl } from './oauth.js';
 
 interface AuthContext {
   payload: JWTPayload;
@@ -15,6 +16,13 @@ export interface AuthOptions {
   /** Custom Authorization Server ID for this domain. */
   authServerId?: string;
   audience?: string;
+  /**
+   * Path of the MCP endpoint this middleware guards, e.g. '/inventory/mcp'.
+   * Set it so 401s carry a WWW-Authenticate challenge pointing at the matching
+   * protected-resource metadata — that pointer is how an MCP client discovers
+   * which Okta Custom Authorization Server to authenticate against.
+   */
+  resourcePath?: string;
   /** Skip token validation entirely and grant every scope — local dev only. */
   allowInsecure?: boolean;
 }
@@ -60,6 +68,23 @@ function resolveIssuer(opts: AuthOptions): string | undefined {
 }
 
 /**
+ * Builds an RFC 6750 challenge for a 401. The resource_metadata parameter is
+ * the one MCP clients act on: it tells them where this endpoint's
+ * protected-resource metadata lives, and from there which authorization server
+ * to use. Quotes and backslashes are stripped since header values can't escape.
+ */
+function challenge(
+  req: Request,
+  resourcePath: string | undefined,
+  params: Record<string, string> = {},
+): string {
+  const all = { ...params };
+  if (resourcePath) all.resource_metadata = resourceMetadataUrl(req, resourcePath);
+  const parts = Object.entries(all).map(([k, v]) => `${k}="${v.replace(/["\\]/g, '')}"`);
+  return parts.length ? `Bearer ${parts.join(', ')}` : 'Bearer';
+}
+
+/**
  * Express middleware: validates the Okta access token (signature, issuer,
  * audience) for every request to /mcp and makes its granted scopes
  * available to tool handlers via `assertScope`/`hasScope`.
@@ -92,6 +117,8 @@ export function bearerAuth(opts: AuthOptions = {}) {
 
     const header = req.headers.authorization;
     if (!header?.startsWith('Bearer ')) {
+      // No credentials presented: bare challenge, no error param (RFC 6750 §3).
+      res.set('WWW-Authenticate', challenge(req, opts.resourcePath));
       res.status(401).json({ error: 'Missing bearer token' });
       return;
     }
@@ -103,7 +130,12 @@ export function bearerAuth(opts: AuthOptions = {}) {
       });
       authStorage.run({ payload, scopes: scopesOf(payload) }, next);
     } catch (err) {
-      res.status(401).json({ error: 'Invalid token', detail: (err as Error).message });
+      const detail = (err as Error).message;
+      res.set(
+        'WWW-Authenticate',
+        challenge(req, opts.resourcePath, { error: 'invalid_token', error_description: detail }),
+      );
+      res.status(401).json({ error: 'Invalid token', detail });
     }
   };
 }
