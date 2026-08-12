@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "exports": {
+    ".": "./dist/server.js",
+    "./app": "./dist/app.js"
+  },
   "scripts": {
     "predev": "npm run stop --silent",
     "dev": "tsx watch --env-file=.env src/server.ts",
@@ -11,6 +15,7 @@
     "start": "node dist/server.js"
   },
   "dependencies": {
+    "@progear/shared": "*",
     "cookie-parser": "^1.4.6",
     "express": "^4.21.0",
     "jose": "^5.9.0"

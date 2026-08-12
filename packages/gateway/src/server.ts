@@ -1,5 +1,6 @@
 import express from 'express';
 import { buildMcpApp, mountProtectedResourceMetadata, type AuthOptions } from '@progear/shared';
+import { createTesterApp } from '@progear/local-tester/app';
 import { buildServer as buildInventoryServer } from '@progear/mcp-inventory/tools';
 import { buildServer as buildCustomerServer } from '@progear/mcp-customer/tools';
 import { buildServer as buildSalesServer } from '@progear/mcp-sales/tools';
@@ -7,6 +8,11 @@ import { buildServer as buildPricingServer } from '@progear/mcp-pricing/tools';
 
 const oktaDomain = process.env.OKTA_DOMAIN?.replace(/\/$/, '');
 const allowInsecure = process.env.ALLOW_INSECURE === 'true';
+// The demo UI shares this process and origin with the MCP endpoints, which
+// keeps it to one deployment. Set ENABLE_TESTER_UI=false to serve MCP only —
+// worth doing if this process is ever exposed to agents you don't control,
+// since the UI holds the ID-JAG signing key.
+const enableTesterUi = process.env.ENABLE_TESTER_UI !== 'false';
 
 const domains = [
   {
@@ -94,6 +100,7 @@ app.get('/health', (_req, res) => {
   res.json({
     status: 'healthy',
     service: 'progear-mcp-gateway',
+    testerUi: enableTesterUi ? '/' : null,
     mounts: domains.map((d) => ({
       mcp: `${d.path}/mcp`,
       resourceMetadata: `/.well-known/oauth-protected-resource${d.path}/mcp`,
@@ -102,8 +109,19 @@ app.get('/health', (_req, res) => {
   });
 });
 
+// Mounted last so it can own '/' without shadowing /health, the MCP endpoints,
+// or the discovery documents. Its OAuth redirect URI and MCP base URL are
+// derived from the request, so no extra URL config is needed here.
+if (enableTesterUi) {
+  if (!process.env.OKTA_CLIENT_ID || !process.env.OKTA_AI_AGENT_ID) {
+    console.warn('[gateway] tester UI is on but OKTA_CLIENT_ID / OKTA_AI_AGENT_ID are not set — sign-in will fail');
+  }
+  app.use(createTesterApp({ sameOriginGateway: true }));
+}
+
 const port = Number(process.env.PORT ?? 3000);
 app.listen(port, () => {
   console.log(`ProGear MCP gateway listening on port ${port}`);
   for (const d of domains) console.log(`  ${d.path}/mcp -> ${d.serviceName}`);
+  if (enableTesterUi) console.log('  /            -> tester UI');
 });

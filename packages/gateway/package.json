@@ -9,6 +9,7 @@
     "start": "node dist/server.js"
   },
   "dependencies": {
+    "@progear/local-tester": "*",
     "@progear/mcp-customer": "*",
     "@progear/mcp-inventory": "*",
     "@progear/mcp-pricing": "*",

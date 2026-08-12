@@ -25,3 +25,13 @@ services:
         sync: false
       - key: OKTA_PRICING_AUDIENCE
         sync: false
+      # The demo UI is served by this same process at '/'. Set
+      # ENABLE_TESTER_UI=false to serve the MCP endpoints only.
+      - key: OKTA_CLIENT_ID
+        sync: false
+      - key: OKTA_CLIENT_SECRET
+        sync: false
+      - key: OKTA_AI_AGENT_ID
+        sync: false
+      - key: OKTA_AI_AGENT_PRIVATE_KEY
+        sync: false

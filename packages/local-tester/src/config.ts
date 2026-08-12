@@ -1,3 +1,6 @@
+import type { Request } from 'express';
+import { publicBaseUrl } from '@progear/shared';
+
 function required(name: string): string {
   const value = process.env[name];
   if (!value) throw new Error(`Missing required env var: ${name}`);
@@ -6,6 +9,7 @@ function required(name: string): string {
 
 export const config = {
   port: Number(process.env.PORT ?? 4000),
+  /** Standalone defaults. Mounted inside the gateway, both come from the request. */
   redirectUri: process.env.REDIRECT_URI ?? `http://localhost:${Number(process.env.PORT ?? 4000)}/callback`,
   gatewayBaseUrl: (process.env.MCP_GATEWAY_BASE_URL ?? 'http://localhost:3000').replace(/\/$/, ''),
 
@@ -18,6 +22,24 @@ export const config = {
   agentId: () => required('OKTA_AI_AGENT_ID'),
   agentPrivateJwk: () => JSON.parse(required('OKTA_AI_AGENT_PRIVATE_KEY')),
 };
+
+/**
+ * Where Okta should send the user back to. An explicit REDIRECT_URI always
+ * wins — it has to match the Okta app registration character for character.
+ * Otherwise, when the UI is served by the gateway itself the callback is on
+ * that same origin, so derive it from the request (this is what makes the
+ * single-service deployment need no URL configuration at all).
+ */
+export function resolveRedirectUri(req: Request, sameOriginGateway: boolean): string {
+  if (process.env.REDIRECT_URI) return process.env.REDIRECT_URI;
+  return sameOriginGateway ? `${publicBaseUrl(req)}/callback` : config.redirectUri;
+}
+
+/** Origin the MCP endpoints are on — same as the UI's when mounted in the gateway. */
+export function resolveGatewayBaseUrl(req: Request, sameOriginGateway: boolean): string {
+  if (process.env.MCP_GATEWAY_BASE_URL) return config.gatewayBaseUrl;
+  return sameOriginGateway ? publicBaseUrl(req) : config.gatewayBaseUrl;
+}
 
 export interface ToolSpec {
   name: string;
