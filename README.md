@@ -124,5 +124,44 @@ WWW-Authenticate: Bearer resource_metadata="https://<your-render-url>/.well-know
 The URLs in these documents are derived from the incoming request (`X-Forwarded-Proto` + `Host`, with `trust proxy` on — correct on Render). Set `PUBLIC_BASE_URL=https://<your-render-url>` only if something in front of the gateway rewrites the `Host` header.
 
 To let a client complete the flow, register an OIDC **public** client (Authorization Code + PKCE) in your Okta org, add the client's redirect URI (Claude.ai uses `https://claude.ai/api/mcp/auth_callback`), and grant the domain's scopes in that Custom Authorization Server's access policy.
+Two things to note about these documents: there is no *unscoped* `/.well-known/oauth-protected-resource` — it would be ambiguous across four resources, so it 404s on purpose — and the gateway serves no `/.well-known/oauth-authorization-server`. That second document comes from Okta at `{issuer}/.well-known/oauth-authorization-server`, which is what the client follows next. Both endpoints exist only on the gateway; the standalone per-domain dev servers (`packages/mcp-*`) don't have them.
 
-**Still missing for fully zero-config connect:** [dynamic client registration](https://www.rfc-editor.org/rfc/rfc7591). Okta's `/oauth2/v1/clients` endpoint requires an SSWS API token, so it can't be advertised for anonymous registration — clients that insist on DCR (VS Code / Copilot today) need a registration shim in front of it. Clients that accept a pre-registered `client_id` can use the discovery above as-is.
+### Connecting Claude Code with a pre-registered client ID
+
+`claude mcp add` takes a `client_id`, plus a fixed callback port — which you need, because Okta requires exact redirect URIs and won't accept a random port:
+
+```bash
+claude mcp add --transport http \
+  --client-id 0oaXXXXXXXXXXXXXXXX \
+  --callback-port 33418 \
+  progear-inventory https://progear-mcp-servers.onrender.com/inventory/mcp
+```
+
+Then in Claude Code: `/mcp` → select **progear-inventory** → **Authenticate**. That fetches the protected-resource document above, redirects you to the inventory Custom AS, and stores the token.
+
+Repeat per domain (one Okta app can serve all four):
+
+```bash
+claude mcp add --transport http --client-id 0oaXXXXXXXXXXXXXXXX --callback-port 33418 \
+  progear-customer https://progear-mcp-servers.onrender.com/customer/mcp
+claude mcp add --transport http --client-id 0oaXXXXXXXXXXXXXXXX --callback-port 33418 \
+  progear-sales    https://progear-mcp-servers.onrender.com/sales/mcp
+claude mcp add --transport http --client-id 0oaXXXXXXXXXXXXXXXX --callback-port 33418 \
+  progear-pricing  https://progear-mcp-servers.onrender.com/pricing/mcp
+```
+
+Okta side, before that works:
+
+- An OIDC app of type **Native** or **SPA** (public client): grant types Authorization Code + Refresh Token, PKCE required, no client secret.
+- Sign-in redirect URI `http://localhost:33418/callback`. If auth fails with a `redirect_uri` mismatch, read the actual `redirect_uri` out of the authorize URL in your browser's address bar and register that instead.
+- In each of the four Custom Authorization Servers, an access-policy rule that allows this client and grants that domain's scopes.
+
+Okta ignores the RFC 8707 `resource` parameter Claude sends and stamps `aud` from the Custom AS's own audience setting — which is exactly why the per-domain AS split works here without extra wiring.
+
+If you'd rather skip OAuth entirely for a quick test, the static-token path still works:
+
+```bash
+claude mcp add --transport http progear-inventory \
+  https://progear-mcp-servers.onrender.com/inventory/mcp \
+  --header "Authorization: Bearer <token from the demo app>"
+```
