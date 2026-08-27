@@ -18,10 +18,58 @@ export const config = {
   clientSecret: () => required('OKTA_CLIENT_SECRET'),
   /** Optional — if unset, ID-JAG step 1 goes to the org-level token endpoint (https://{domain}/oauth2/v1/token). */
   mainAuthServerId: () => process.env.OKTA_MAIN_AUTH_SERVER_ID || undefined,
+  /**
+   * Issuer the human login runs against. `OKTA_ISSUER` wins — set it to a full
+   * issuer URL, either the org issuer (`https://{domain}`) or a Custom
+   * Authorization Server's (`https://{domain}/oauth2/{ausId}`), and /authorize
+   * and /token are derived from it. Otherwise it falls back to
+   * `OKTA_MAIN_AUTH_SERVER_ID`, then to the org issuer, so leaving it unset
+   * behaves exactly as before.
+   *
+   * Note the ID-JAG exchange still runs at the org (or main) authorization
+   * server — Okta issues ID-JAGs there, not at a per-resource Custom AS. Point
+   * OKTA_ISSUER at a Custom AS and the login token may not be accepted as the
+   * exchange's subject token; keep both on the same AS if you hit that.
+   */
+  loginIssuer: (): string => {
+    const explicit = process.env.OKTA_ISSUER?.replace(/\/$/, '');
+    if (explicit) return explicit;
+    const domain = required('OKTA_DOMAIN').replace(/\/$/, '');
+    const mainAuthServerId = process.env.OKTA_MAIN_AUTH_SERVER_ID;
+    return mainAuthServerId ? `${domain}/oauth2/${mainAuthServerId}` : domain;
+  },
 
   agentId: () => required('OKTA_AI_AGENT_ID'),
   agentPrivateJwk: () => JSON.parse(required('OKTA_AI_AGENT_PRIVATE_KEY')),
+  /**
+   * RFC 8707 resource indicator sent with the human login — the *agent's*
+   * resource URL. It audience-binds the access token the user gets back to the
+   * agent that will run the ID-JAG exchange on their behalf, so that token's
+   * `aud` is the agent rather than Okta's own API. Optional: when unset the
+   * `resource` parameter is left off /authorize and /token entirely.
+   */
+  agentAudience: () => process.env.OKTA_AI_AGENT_AUDIENCE || undefined,
+  /**
+   * Which of the user's login tokens is presented as the ID-JAG subject token.
+   * Okta accepts either urn:...:token-type:id_token or :access_token. Defaults
+   * to the access token once it is audience-bound to the agent (above), else
+   * the ID token. Set OKTA_ID_JAG_SUBJECT_TOKEN to force one.
+   */
+  idJagSubjectTokenType: (): 'id_token' | 'access_token' => {
+    const override = process.env.OKTA_ID_JAG_SUBJECT_TOKEN;
+    if (override === 'id_token' || override === 'access_token') return override;
+    return process.env.OKTA_AI_AGENT_AUDIENCE ? 'access_token' : 'id_token';
+  },
 };
+
+/**
+ * An OAuth endpoint on an issuer. A Custom Authorization Server's issuer already
+ * carries `/oauth2/{ausId}`, so its endpoints hang straight off it; the org
+ * issuer is the bare domain, whose endpoints live under `/oauth2/v1`.
+ */
+export function issuerEndpoint(issuer: string, endpoint: 'authorize' | 'token'): string {
+  return issuer.includes('/oauth2/') ? `${issuer}/v1/${endpoint}` : `${issuer}/oauth2/v1/${endpoint}`;
+}
 
 /**
  * Where Okta should send the user back to. An explicit REDIRECT_URI always

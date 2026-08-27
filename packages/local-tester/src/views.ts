@@ -113,6 +113,44 @@ function page(title: string, body: string, opts: { centered?: boolean } = {}): s
     .pill-match { background: var(--green-dim); color: var(--green); }
     .pill-mismatch { background: var(--red-dim); color: var(--red); }
 
+    .hint { color: var(--text-dim); font-size: 13px; }
+
+    /* Result page: result on the left, tokens pinned on the right. Collapses to
+       one column on narrow viewports, tokens last. */
+    .layout { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 24px; align-items: start; }
+    .side { position: sticky; top: 24px; display: flex; flex-direction: column; gap: 12px; }
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: minmax(0, 1fr); }
+      .side { position: static; }
+    }
+
+    .token-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+    }
+    .token-name { font-size: 13px; font-weight: 600; }
+    .token-meta { color: var(--text-dim); font-size: 12px; margin: 4px 0 10px; line-height: 1.45; }
+    .token-meta code { word-break: break-all; }
+
+    /* The compact JWT itself. Long and unbreakable, so: break anywhere, and
+       cap the height rather than letting one token push the page down. */
+    .token-raw {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 11px;
+      line-height: 1.55;
+      color: var(--text-dim);
+      word-break: break-all;
+      max-height: 150px;
+      overflow-y: auto;
+      user-select: all;
+    }
+
     /* One collapsed row per tool, stacked. Summary = name + description;
        expanding reveals the arguments editor and Run. */
     .tool-list { display: flex; flex-direction: column; gap: 8px; }
@@ -231,6 +269,24 @@ function copyRow(idPrefix: string, rawToken: string, decodedClaims: unknown): st
   </div>`;
 }
 
+/** One sidebar card: what the token is, the compact string itself, copy buttons, claims on demand. */
+function tokenCard(opts: {
+  idPrefix: string;
+  name: string;
+  /** Trusted HTML — callers escape any interpolated values themselves. */
+  meta: string;
+  rawToken: string;
+  claims: unknown;
+}): string {
+  return `<div class="token-card">
+    <div class="token-name">${escapeHtml(opts.name)}</div>
+    <p class="token-meta">${opts.meta}</p>
+    <div class="token-raw">${escapeHtml(opts.rawToken)}</div>
+    ${copyRow(opts.idPrefix, opts.rawToken, opts.claims ?? null)}
+    ${opts.claims ? `<details><summary>Decoded claims</summary><pre>${json(opts.claims)}</pre></details>` : ''}
+  </div>`;
+}
+
 export function loginPage(): string {
   return page(
     'ProGear MCP',
@@ -294,52 +350,66 @@ export function dashboardPage(user: { sub?: string; email?: string; name?: strin
 
 export function resultPage(opts: {
   domainLabel: string;
+  /** Domain key, i.e. the gateway mount path segment: /<key>/mcp. */
+  domainKey: string;
   toolName: string;
   toolArguments: unknown;
-  idToken: string;
-  idTokenClaims: unknown;
-  idJagToken: string;
-  idJagClaims: unknown;
+  /** The access token from the human login, when Okta returned one. */
+  userAccessToken?: string;
+  userAccessClaims?: unknown;
   domainAccessToken: string;
   accessClaims: unknown;
   audienceCheck: { expected: string; actual: unknown; match: boolean };
   rawResponse: JsonRpcToolCallResponse;
 }): string {
+  const userTokenCard = opts.userAccessToken
+    ? tokenCard({
+        idPrefix: 'useraccess',
+        name: 'End user access token',
+        meta: 'From your Okta login. Exchanged by the agent for the token below.',
+        rawToken: opts.userAccessToken,
+        claims: opts.userAccessClaims,
+      })
+    : `<div class="token-card">
+         <div class="token-name">End user access token</div>
+         <p class="token-meta">The login did not return one — the ID token was used to start the exchange instead.</p>
+       </div>`;
+
+  // Only worth the reader's attention when it's wrong; a matching audience is
+  // the expected case and doesn't need saying.
+  const audienceNote = opts.audienceCheck.match
+    ? `Audience <code>${escapeHtml(opts.audienceCheck.expected)}</code>.`
+    : `<span class="pill pill-mismatch">AUDIENCE MISMATCH</span> expected <code>${escapeHtml(opts.audienceCheck.expected)}</code>,
+       got <code>${escapeHtml(JSON.stringify(opts.audienceCheck.actual))}</code>.`;
+
   return page(
     'ProGear MCP — result',
     `<h1>${escapeHtml(opts.domainLabel)} — ${escapeHtml(opts.toolName)}</h1>
 
-     <details class="step" open>
-       <summary class="step-title">Step 1 — your ID token (PKCE login)</summary>
-       <pre>${json(opts.idTokenClaims)}</pre>
-       ${copyRow('idtoken', opts.idToken, opts.idTokenClaims)}
-     </details>
+     <div class="layout">
+       <div>
+         <div class="step">
+           <p><code>${escapeHtml(opts.toolName)}(${escapeHtml(JSON.stringify(opts.toolArguments))})</code></p>
+           ${formatMcpResult(opts.rawResponse)}
+           <details>
+             <summary>Show raw JSON-RPC response</summary>
+             <pre>${json(opts.rawResponse)}</pre>
+           </details>
+         </div>
+         <div class="foot-nav"><a href="/">Back to dashboard</a></div>
+       </div>
 
-     <details class="step" open>
-       <summary class="step-title">Step 2 — ID-JAG (org token endpoint, audience = domain auth server)</summary>
-       <pre>${json(opts.idJagClaims)}</pre>
-       ${copyRow('idjag', opts.idJagToken, opts.idJagClaims)}
-     </details>
-
-     <details class="step" open>
-       <summary class="step-title">Step 3 — domain access token (jwt-bearer grant with the ID-JAG as assertion)</summary>
-       <pre>${json(opts.accessClaims)}</pre>
-       <p>Audience check: expected <code>${escapeHtml(opts.audienceCheck.expected)}</code>, got <code>${escapeHtml(JSON.stringify(opts.audienceCheck.actual))}</code> —
-         <span class="pill ${opts.audienceCheck.match ? 'pill-match' : 'pill-mismatch'}">${opts.audienceCheck.match ? 'match' : 'MISMATCH'}</span></p>
-       ${copyRow('access', opts.domainAccessToken, opts.accessClaims)}
-     </details>
-
-     <div class="step">
-       <div class="step-title">Step 4 — tool call against the deployed gateway</div>
-       <p><code>${escapeHtml(opts.toolName)}(${escapeHtml(JSON.stringify(opts.toolArguments))})</code></p>
-       ${formatMcpResult(opts.rawResponse)}
-       <details>
-         <summary>Show raw JSON-RPC response</summary>
-         <pre>${json(opts.rawResponse)}</pre>
-       </details>
-     </div>
-
-     <div class="foot-nav"><a href="/">Back to dashboard</a></div>`,
+       <aside class="side">
+         ${userTokenCard}
+         ${tokenCard({
+           idPrefix: 'access',
+           name: 'MCP server access token',
+           meta: `Bearer token sent to <code>/${escapeHtml(opts.domainKey)}/mcp</code>. ${audienceNote}`,
+           rawToken: opts.domainAccessToken,
+           claims: opts.accessClaims,
+         })}
+       </aside>
+     </div>`,
   );
 }
 

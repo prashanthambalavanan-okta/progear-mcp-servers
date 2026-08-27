@@ -31,7 +31,18 @@ services:
         sync: false
       - key: OKTA_CLIENT_SECRET
         sync: false
+      # Issuer the human login runs against — the org issuer
+      # (https://{domain}) or a Custom AS issuer
+      # (https://{domain}/oauth2/{ausId}). Optional: defaults to the org
+      # issuer derived from OKTA_DOMAIN.
+      - key: OKTA_ISSUER
+        sync: false
       - key: OKTA_AI_AGENT_ID
         sync: false
       - key: OKTA_AI_AGENT_PRIVATE_KEY
+        sync: false
+      # The agent's resource URL. Sent as the RFC 8707 `resource` parameter on
+      # the human login so the user's access token is audience-bound to the
+      # agent that then runs the ID-JAG exchange. Optional.
+      - key: OKTA_AI_AGENT_AUDIENCE
         sync: false

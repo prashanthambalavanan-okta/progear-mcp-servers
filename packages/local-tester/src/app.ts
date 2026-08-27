@@ -7,13 +7,31 @@ import {
   DOMAINS,
   domainAudience,
   domainAuthServerId,
+  issuerEndpoint,
   resolveGatewayBaseUrl,
   resolveRedirectUri,
 } from './config.js';
-import { exchangeIdTokenForDomainAccessToken } from './idJag.js';
+import { exchangeUserTokenForDomainAccessToken } from './idJag.js';
 import { callMcpTool } from './mcpClient.js';
 import { generatePkce, randomState } from './pkce.js';
 import { dashboardPage, errorPage, loginPage, resultPage } from './views.js';
+
+/** Access tokens are not guaranteed to be JWTs — show what we can, never throw. */
+function safeDecodeJwt(token: string): Record<string, unknown> | undefined {
+  try {
+    return decodeJwt(token) as Record<string, unknown>;
+  } catch {
+    return undefined;
+  }
+}
+
+interface Session {
+  idToken: string;
+  claims: Record<string, unknown>;
+  /** The user's access token from the same login — `aud` is the agent when `resource` was sent. */
+  userAccessToken?: string;
+  userAccessClaims?: Record<string, unknown>;
+}
 
 export interface TesterAppOptions {
   /**
@@ -35,7 +53,7 @@ export function createTesterApp(options: TesterAppOptions = {}) {
 
   // Short-lived, in-memory only — this app never persists anything to disk.
   const pendingLogins = new Map<string, { verifier: string }>();
-  const sessions = new Map<string, { idToken: string; claims: Record<string, unknown> }>();
+  const sessions = new Map<string, Session>();
 
   app.get('/', (req, res) => {
     const sid = req.cookies?.sid;
@@ -52,8 +70,7 @@ export function createTesterApp(options: TesterAppOptions = {}) {
     const state = randomState();
     pendingLogins.set(state, { verifier });
 
-    const authorizeUrl = new URL(`${config.oktaDomain()}/oauth2/v1/authorize`);
-    authorizeUrl.search = new URLSearchParams({
+    const params: Record<string, string> = {
       client_id: config.clientId(),
       response_type: 'code',
       scope: 'openid profile email',
@@ -61,7 +78,15 @@ export function createTesterApp(options: TesterAppOptions = {}) {
       state,
       code_challenge: challenge,
       code_challenge_method: 'S256',
-    }).toString();
+    };
+    // RFC 8707: ask for an access token audience-bound to the agent that will
+    // later exchange it for an ID-JAG. Must be sent on both /authorize and
+    // /token — Okta pins the audience at consent and re-checks it at exchange.
+    const resource = config.agentAudience();
+    if (resource) params.resource = resource;
+
+    const authorizeUrl = new URL(issuerEndpoint(config.loginIssuer(), 'authorize'));
+    authorizeUrl.search = new URLSearchParams(params).toString();
 
     res.redirect(authorizeUrl.toString());
   });
@@ -78,19 +103,23 @@ export function createTesterApp(options: TesterAppOptions = {}) {
     pendingLogins.delete(state);
 
     try {
+      const body: Record<string, string> = {
+        grant_type: 'authorization_code',
+        code,
+        redirect_uri: resolveRedirectUri(req, sameOrigin),
+        code_verifier: pending.verifier,
+      };
+      const resource = config.agentAudience();
+      if (resource) body.resource = resource;
+
       const basicAuth = Buffer.from(`${config.clientId()}:${config.clientSecret()}`).toString('base64');
-      const tokenRes = await fetch(`${config.oktaDomain()}/oauth2/v1/token`, {
+      const tokenRes = await fetch(issuerEndpoint(config.loginIssuer(), 'token'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
           Authorization: `Basic ${basicAuth}`,
         },
-        body: new URLSearchParams({
-          grant_type: 'authorization_code',
-          code,
-          redirect_uri: resolveRedirectUri(req, sameOrigin),
-          code_verifier: pending.verifier,
-        }),
+        body: new URLSearchParams(body),
       });
 
       const tokenJson = await tokenRes.json();
@@ -99,8 +128,14 @@ export function createTesterApp(options: TesterAppOptions = {}) {
       const idToken = tokenJson.id_token as string;
       const claims = decodeJwt(idToken) as Record<string, unknown>;
 
+      // Kept because it is the token that carries the agent as its audience,
+      // and (by default, when `resource` is configured) it is what gets
+      // presented as the ID-JAG subject token.
+      const userAccessToken = tokenJson.access_token as string | undefined;
+      const userAccessClaims = userAccessToken ? safeDecodeJwt(userAccessToken) : undefined;
+
       const sid = randomUUID();
-      sessions.set(sid, { idToken, claims });
+      sessions.set(sid, { idToken, claims, userAccessToken, userAccessClaims });
       res.cookie('sid', sid, { httpOnly: true, sameSite: 'lax', secure: req.secure });
       res.redirect('/');
     } catch (err) {
@@ -147,12 +182,30 @@ export function createTesterApp(options: TesterAppOptions = {}) {
       return;
     }
 
+    // Which login token starts the ID-JAG chain. In access_token mode it is the
+    // one audience-bound to the agent by the `resource` parameter on login.
+    const subjectTokenType = config.idJagSubjectTokenType();
+    const subjectToken = subjectTokenType === 'access_token' ? session.userAccessToken : session.idToken;
+    if (!subjectToken) {
+      res
+        .status(500)
+        .send(
+          errorPage(
+            'selecting the ID-JAG subject token',
+            'Configured to use the access token as the ID-JAG subject token, but the login did not return one. ' +
+              'Log out and back in, or set OKTA_ID_JAG_SUBJECT_TOKEN=id_token.',
+          ),
+        );
+      return;
+    }
+
     try {
-      const { idJag, accessToken } = await exchangeIdTokenForDomainAccessToken({
+      const { accessToken } = await exchangeUserTokenForDomainAccessToken({
         oktaDomain: config.oktaDomain(),
         mainAuthServerId: config.mainAuthServerId(),
         domainAuthServerId: domainAuthServerId(domain),
-        idToken: session.idToken,
+        subjectToken,
+        subjectTokenType,
         scope: domain.scopes.join(' '),
         agentId: config.agentId(),
         agentPrivateJwk: config.agentPrivateJwk(),
@@ -171,12 +224,11 @@ export function createTesterApp(options: TesterAppOptions = {}) {
       res.send(
         resultPage({
           domainLabel: domain.label,
+          domainKey: domain.key,
           toolName: tool.name,
           toolArguments,
-          idToken: session.idToken,
-          idTokenClaims: session.claims,
-          idJagToken: idJag.idJagToken,
-          idJagClaims: idJag.idJagClaims,
+          userAccessToken: session.userAccessToken,
+          userAccessClaims: session.userAccessClaims,
           domainAccessToken: accessToken.accessToken,
           accessClaims: accessToken.accessClaims,
           audienceCheck: {

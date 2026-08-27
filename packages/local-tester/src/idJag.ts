@@ -6,9 +6,10 @@ import { UpstreamHttpError } from './httpError.js';
  * Raw HTTP implementation of the Identity Assertion Authorization Grant
  * (ID-JAG) flow — draft-parecki-oauth-identity-assertion-authz-grant.
  *
- * Step 1: exchange the user's OIDC ID token for an ID-JAG at the org's
+ * Step 1: exchange one of the user's login tokens for an ID-JAG at the org's
  *         token endpoint (audience = the target Custom Authorization
- *         Server's issuer URL).
+ *         Server's issuer URL). Okta accepts either the ID token or the
+ *         access token as the subject token.
  * Step 2: present that ID-JAG as a JWT-bearer assertion at the target
  *         Custom Authorization Server's own token endpoint to get a
  *         normal, domain-scoped access token.
@@ -58,10 +59,13 @@ export interface AccessTokenResult {
   raw: any;
 }
 
-/** Step 1: ID token -> ID-JAG, scoped to `targetIssuer` (the resource domain's auth server issuer). */
+export type SubjectTokenType = 'id_token' | 'access_token';
+
+/** Step 1: user token -> ID-JAG, scoped to `targetIssuer` (the resource domain's auth server issuer). */
 export async function requestIdJag(opts: {
   orgTokenEndpoint: string;
-  idToken: string;
+  subjectToken: string;
+  subjectTokenType: SubjectTokenType;
   targetIssuer: string;
   scope: string;
   agentId: string;
@@ -72,8 +76,8 @@ export async function requestIdJag(opts: {
   const raw = await postForm(opts.orgTokenEndpoint, {
     grant_type: 'urn:ietf:params:oauth:grant-type:token-exchange',
     requested_token_type: 'urn:ietf:params:oauth:token-type:id-jag',
-    subject_token: opts.idToken,
-    subject_token_type: 'urn:ietf:params:oauth:token-type:id_token',
+    subject_token: opts.subjectToken,
+    subject_token_type: `urn:ietf:params:oauth:token-type:${opts.subjectTokenType}`,
     audience: opts.targetIssuer,
     scope: opts.scope,
     client_id: opts.agentId,
@@ -111,12 +115,13 @@ export interface FullExchangeResult {
   accessToken: AccessTokenResult;
 }
 
-/** Runs both steps: ID token -> ID-JAG (org AS) -> domain access token (domain's own AS). */
-export async function exchangeIdTokenForDomainAccessToken(opts: {
+/** Runs both steps: user token -> ID-JAG (org AS) -> domain access token (domain's own AS). */
+export async function exchangeUserTokenForDomainAccessToken(opts: {
   oktaDomain: string;
   mainAuthServerId?: string;
   domainAuthServerId: string;
-  idToken: string;
+  subjectToken: string;
+  subjectTokenType: SubjectTokenType;
   scope: string;
   agentId: string;
   agentPrivateJwk: JWK;
@@ -130,7 +135,8 @@ export async function exchangeIdTokenForDomainAccessToken(opts: {
 
   const idJag = await requestIdJag({
     orgTokenEndpoint,
-    idToken: opts.idToken,
+    subjectToken: opts.subjectToken,
+    subjectTokenType: opts.subjectTokenType,
     targetIssuer,
     scope: opts.scope,
     agentId: opts.agentId,
